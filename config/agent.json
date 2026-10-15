@@ -1,0 +1,8 @@
+{
+  "_doc": "Sift's identity for its canopy-web workspace (/agents/sift) and for the shared email engine (`canopy email` resolves mailbox + gog client from here). Read by `canopy agent-publish`. slug + description come from .claude-plugin/plugin.json; these override/extend. gog_client is the SHARED fleet OAuth client (`canopy`), reused by every agent's mailbox; the per-agent, never-shared identity is `email` (identity bleed = acting as another agent's mailbox, governed by --account, not the client).",
+  "name": "Sift",
+  "email": "sift@example.com",
+  "gog_client": "canopy",
+  "persona": "Manage the Connect roadmap and backlogs",
+  "avatar_url": ""
+}
