@@ -28,8 +28,9 @@ bin/sift-jira search --jql 'project in (CCC, CCCT) AND statusCategory != Done OR
 bin/sift-jira search --jql 'project = CCC AND statusCategory != Done' > "$T/roadmap.json"
 ```
 On the weekly cadence, narrow to what changed since last sweep:
-`canopy cursor since backlog-triage --repo . --items - < "$T/open.json"`. A
-full sweep (asked for explicitly, or first run) skips the cursor. Use `bin/sift-jira issue <KEY>`
+`canopy cursor since backlog-triage --local ~/.sift/state --items - < "$T/open.json"`. The cursor lives in
+`~/.sift/state` on this machine (Sift has no Google Drive yet). A full sweep (asked for
+explicitly, or first run) skips the cursor. Use `bin/sift-jira issue <KEY>`
 for any ticket you need to read in full before judging it.
 
 ## 3. Judge — one finding per ticket, with a concrete change
@@ -63,7 +64,7 @@ approver may strike lines — remove them from the plan (and remember them as de
 bin/sift-jira apply plan.json --approved-by "<approver's name>"
 ```
 Report what applied and anything that errored (one line each), then bump the cursor with the
-tickets you reviewed: `canopy cursor bump backlog-triage --repo . --items - < "$T/open.json"`.
+tickets you reviewed: `canopy cursor bump backlog-triage --local ~/.sift/state --items - < "$T/open.json"`.
 
 ## Never
 - Write to Jira any other way (Atlassian MCP write tools, curl, `acli`) — railed in `config/gating.json`.
