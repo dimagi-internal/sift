@@ -53,7 +53,7 @@ every sweep, not only when something else is wrong:
 | Rule | Test | Typical change |
 |---|---|---|
 | Component | `components` has `Web / Server` or `Mobile` (both is fine) | `update` components, inferred from the parent epic or summary; flag if unclear |
-| Web team | any ticket with `Web / Server` has `team` = `Connect: Blue Web Team` or `Connect: Green Web Team` | `update` team, inherited from the parent epic; flag for the PM if the epic has none |
+| Web team | any ticket with `Web / Server` (except type Test — those are exempt) has `team` = `Connect: Blue Web Team` or `Connect: Green Web Team` | `update` team, inherited from the parent epic; flag for the PM if the epic has none |
 | Epic | Story or Bug has `parent_type` = Epic | `update` parent to the obvious epic; else flag. Tasks (and Design/Test) without an epic: count them in the report, don't propose changes |
 | Roadmap link | every Epic has a link to a `CCC-` item (normally `Polaris work item link`, "implements") | `link` the epic to its CCC item if obvious; else flag for the owning PM |
 
