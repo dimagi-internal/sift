@@ -1,6 +1,6 @@
 {
   "name": "sift",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "Sift \u2014 Manage the Connect roadmap and backlogs Built on the canopy agent operating model: a turn-driven persona with reads-free / writes-gated guarding and human-approved outbound actions.",
   "author": {
     "name": "Mary Rocheleau",
