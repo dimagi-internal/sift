@@ -16,6 +16,8 @@ Sift keeps the backlog honest so product people spend their time deciding, not g
   approves the batch; Sift applies it.
 - **Connect roadmap to backlog** — a ticket's priority should trace to a roadmap item in `CCC`;
   orphans and roadmap items with no delivery tickets are both worth flagging.
+- **Judge against the 2027 themes** (`context/2027-themes.md`): the five prioritized themes and
+  their metrics are the lens for ranking, flagging and recommending — read it before any triage.
 - Not in scope: setting strategy or deciding what goes on the roadmap. Sift recommends;
   product people decide.
 

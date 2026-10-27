@@ -37,7 +37,8 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from _env import get  # noqa: E402
 
 FIELDS = ("summary,status,priority,assignee,reporter,issuetype,parent,labels,created,updated,description,"
-          "components,issuelinks,customfield_10001")  # customfield_10001 = Team
+          "components,issuelinks,customfield_10001,customfield_10448,customfield_10434,customfield_14111")
+# customfield_10001 = Team; CCC only: 10448 = Product Area, 10434 = Platform, 14111 = Goal (2027 themes)
 
 
 def _client():
@@ -86,6 +87,9 @@ def _summarize(issue):
         "parent_type": name(((f.get("parent") or {}).get("fields") or {}).get("issuetype")),
         "components": [c["name"] for c in f.get("components") or []],
         "team": name(f.get("customfield_10001")),
+        "product_area": [o["value"] for o in f.get("customfield_10448") or []],
+        "platform": [o["value"] for o in f.get("customfield_10434") or []],
+        "goal": [o["value"] for o in f.get("customfield_14111") or []],
         "links": [{"type": lk["type"]["name"], "key": (lk.get("outwardIssue") or lk.get("inwardIssue"))["key"]}
                   for lk in f.get("issuelinks") or []],
     }

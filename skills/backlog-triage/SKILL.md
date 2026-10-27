@@ -14,6 +14,8 @@ Reads are free; Jira writes happen only via `bin/sift-jira apply` on a plan a hu
 Capability lives in `bin/sift-jira`; this skill is the judgment around it.
 
 ## 1. Scope the sweep
+- Read `context/2027-themes.md` first — the five 2027 themes are the lens for every judgment
+  below (what counts as drift, what to rank first, which gaps to flag).
 - Projects: `sift_JIRA_PROJECTS` (default `CCC,CCCT`). `CI` (Connect Interrupt) is out of scope
   here — it gets its own weekly `sift:review-interrupt` run.
 - If the asker named a narrower slice (an epic, a component, "just bugs"), use that and say so.
@@ -45,6 +47,17 @@ Check each open ticket against these signals; a ticket can hit several but gets 
 | Unowned | In Progress with no assignee | `comment` @reporter, flag in report |
 | Priority drift | priority higher than its roadmap item's, or High on a stale ticket | `update` priority |
 | Empty roadmap item | CCC item In Progress with no linked CCCT work | flag for the owning PM |
+
+### CCC roadmap hygiene — goal and classification
+Every open CCC item should carry:
+
+| Field | Test | Typical change |
+|---|---|---|
+| Product Area (`customfield_10448`) | non-empty | `update` from the summary / linked CCC items; `{"customfield_10448": [{"value": "…"}]}` |
+| Platform (`customfield_10434`) | `Web` and/or `Mobile` | `update`; `{"customfield_10434": [{"value": "Web"}]}` |
+| Goal (`customfield_14111`) | set, or a deliberate "none" | **never write unprompted** — list candidates per theme (numbered, so the PM can pick) and apply only what she picks |
+
+Report: open CCC items with no Goal (count), and the in-flight ones by name.
 
 ### CCCT hygiene — classification rules
 Every CCCT ticket must also pass these. They are the most common findings, so check them on
