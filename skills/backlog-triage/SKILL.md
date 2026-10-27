@@ -80,6 +80,8 @@ about — say how many you skipped and why, rather than proposing a weak change.
   and epics missing a CCC link: counts before → after this plan), then the change list grouped
   by signal, one line per ticket with its link, then flags that need a human decision rather
   than a Jira edit.
+- Every Jira key you write (report, flags, replies) is a link:
+  `[CCCT-1234](https://dimagi.atlassian.net/browse/CCCT-1234)`. Never a bare key.
 - Dry-run the plan before presenting: `bin/sift-jira apply plan.json --approved-by dry-run --dry-run`.
 
 ## 5. Approval, then apply
