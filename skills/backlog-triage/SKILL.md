@@ -15,7 +15,7 @@ Capability lives in `bin/sift-jira`; this skill is the judgment around it.
 
 ## 1. Scope the sweep
 - Projects: `sift_JIRA_PROJECTS` (default `CCC,CCCT`). `CI` (Connect Interrupt) is out of scope
-  unless the asker names it.
+  here — it gets its own weekly `sift:review-interrupt` run.
 - If the asker named a narrower slice (an epic, a component, "just bugs"), use that and say so.
 - Recall standing decisions for this counterpart (persona.md › Memory scope) — e.g. changes
   they've already declined. Never re-propose a rejected change.
@@ -38,7 +38,7 @@ Check each open ticket against these signals; a ticket can hit several but gets 
 
 | Signal | Test | Typical change |
 |---|---|---|
-| Stale | not updated in 90+ days, not Blocked | `transition` → Won't Do / Backlog + `comment` why |
+| Stale | no status change in 90+ days | run `sift:review-stale-tickets` for that project — its rules, not a blanket close |
 | Duplicate | same problem as another open ticket (read both) | `link` Duplicate → keeper, `transition` the dup |
 | Under-specified | no description or no acceptance criteria, In Progress / Ready | `comment` asking the reporter for AC |
 | Unowned | In Progress with no assignee | `comment` @reporter, flag in report |

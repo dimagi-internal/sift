@@ -10,7 +10,8 @@ Sift only through here, each one logged with who approved it.
 Usage:
   bin/sift-jira search --jql "project = CCCT AND statusCategory != Done" [--max 200]
       -> JSON array of {id, ts, key, summary, status, ...}; pipe into `canopy cursor since`.
-  bin/sift-jira issue CCCT-412            -> one issue, full fields + links + comments
+  bin/sift-jira issue CCCT-412            -> one issue, full fields + links + comments + changelog
+  bin/sift-jira transitions CCCT-412      -> statuses this issue can move to right now
   bin/sift-jira apply plan.json --approved-by "<name>" [--dry-run]
 
 Plan file (written by skills/backlog-triage):
@@ -100,8 +101,15 @@ def cmd_search(a):
 
 
 def cmd_issue(a):
-    json.dump(_call("GET", f"/issue/{a.key}", query={"fields": "*all", "expand": "renderedFields"}),
+    json.dump(_call("GET", f"/issue/{a.key}", query={"fields": "*all", "expand": "renderedFields,changelog"}),
               sys.stdout, indent=1)
+    print()
+
+
+def cmd_transitions(a):
+    ts = _call("GET", f"/issue/{a.key}/transitions")["transitions"]
+    json.dump([{"id": t["id"], "name": t["name"], "to": t["to"]["name"],
+                "category": t["to"]["statusCategory"]["name"]} for t in ts], sys.stdout, indent=1)
     print()
 
 
@@ -158,6 +166,9 @@ def main():
     i = sub.add_parser("issue")
     i.add_argument("key")
     i.set_defaults(fn=cmd_issue)
+    t = sub.add_parser("transitions")
+    t.add_argument("key")
+    t.set_defaults(fn=cmd_transitions)
     ap = sub.add_parser("apply")
     ap.add_argument("plan")
     ap.add_argument("--approved-by", required=True)
