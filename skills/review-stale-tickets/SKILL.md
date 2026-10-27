@@ -26,6 +26,8 @@ Nothing else — CI interrupts go through `sift:review-interrupt`. **Batch cap**
 - **Cursor**: `review-stale-<project>` in `~/.sift/state`. `--full` (or a first run) skips it.
 - Recall standing decisions for this counterpart (persona.md › Memory scope). Never re-propose
   a change someone declined.
+- Read `context/2027-themes.md`. On CCC, a stuck item with a `Goal` gets a **nudge**, never a
+  close — it's on a 2027 theme. Stale items with no Goal are the stronger close candidates.
 
 ## 2. Pull candidates — "stuck", not just "untouched"
 `updated` is a weak signal: a comment, a bulk edit or a sprint sweep resets it without the
