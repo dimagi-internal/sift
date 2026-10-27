@@ -33,4 +33,5 @@ sift_JIRA_PROJECTS=CCC,CCCT
 sift_JIRA_EMAIL=op://${AGENT_VAULT}/jira/username
 sift_JIRA_API_TOKEN=op://${AGENT_VAULT}/jira/credential
 # sift_SOME_SECRET=<1Password ref: AGENT_VAULT / item / field>
-# CANOPY_WEB_PAT=<1Password ref: AGENT_VAULT / item / credential>
+# Sift's own canopy-web token (login sift@dimagi.ai) — never fall back to a person's.
+CANOPY_WEB_PAT=op://${AGENT_VAULT}/canopy-pat/credential
