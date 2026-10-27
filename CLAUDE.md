@@ -6,11 +6,11 @@ Sift is an autonomous agent built on the **canopy agent operating model**
 ## What Sift is
 - **Mandate:** Manage the Connect roadmap and backlogs
 - **Persona + routing key:** identity and voice live in `persona.md`; the primary channel is
-  `sift@example.com`. One thread / one counterpart / one memory scope per turn — never reason about
+  `sift@dimagi.ai`. One thread / one counterpart / one memory scope per turn — never reason about
   two counterparts together (the rule that prevents cross-contamination).
 - **Harness = Claude Code today.** A human triggers a turn ("do a turn"); more autonomy is the
   long-term goal, climbed one rung at a time, not skipped to.
-- **Stakeholders:** the team.
+- **Stakeholders:** Connect product people (PMs + product leads owning CCC / CCCT).
 
 ## Hard guardrail — reads free, writes gated
 Search/read run freely. **Every outbound action (sending on a channel, public writes) requires

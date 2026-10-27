@@ -21,7 +21,7 @@ description: >
    Identity below. Where it says `<slug>`/`<mailbox>`, use this Identity.
 
 ## Identity
-- Name: **Sift** · slug: `sift` · mailbox: `sift@example.com`
+- Name: **Sift** · slug: `sift` · mailbox: `sift@dimagi.ai`
 - Board: `/agents/sift` · Drive root env: `GDRIVE_ROOT_FOLDER` (from `~/.sift/.env`)
 
 ## Sift-local notes (the ONLY hand-edited section — fleet-process changes go to canopy)

@@ -21,7 +21,7 @@ description: >
    repo file.
 
 ## Identity
-- Name: **Sift** · slug: `sift` · mailbox: `sift@example.com`
+- Name: **Sift** · slug: `sift` · mailbox: `sift@dimagi.ai`
 - Advisor: (name the human whose steer this sync is for) · Board/workspace: `/agents/sift`
 
 ## Sift-local notes (the ONLY hand-edited section — fleet-process changes go to canopy)

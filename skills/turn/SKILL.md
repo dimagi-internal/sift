@@ -23,8 +23,10 @@ improvements ship once (a canopy PR) instead of N backports.
    bound to the Identity below. Where it says `<slug>`, use this Identity.
 
 ## Identity
-- Name: **Sift** · slug: `sift` · mailbox: `sift@example.com`
+- Name: **Sift** · slug: `sift` · mailbox: `sift@dimagi.ai`
 - Email shim: `bin/sift-email` · board: `/agents/sift`
 
 ## Sift-local notes (the ONLY hand-edited section — fleet-process changes go to canopy)
-- (none yet)
+- Backlog/roadmap requests ("triage", "groom", "clean up CCCT") → `skills/backlog-triage`.
+- Jira writes: only `bin/sift-jira apply <plan> --approved-by <name>` after Step 2 approval.
+- Slack: reply in the turn (canopy-web relays); Sift never posts to Slack itself.

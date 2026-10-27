@@ -1,7 +1,45 @@
 {
   "_doc": "Rails, not gates (docs/agent-operating-model.md §1a revision, Jon 2026-07-01; canopy docs/architecture/shared-gog-gdrive.md §4): hooks carry DENY rails only — make the wrong path impossible and name the right one, so Sift self-corrects and keeps going at zero autonomy cost. `channels` mounts the FLEET-BASELINE deny rails shipped in the installed canopy plugin (agent-core/gating-baseline.json) — canopy's session gating hook (agent-core/gating_guard.py --session, registered by the canopy plugin, not by this agent) merges them in front of this file's own `deny` list at call time, so a baseline rail fix reaches every agent via /canopy:update. ADD-ONLY: this file can add rails; it can never remove a baseline one. `approve` stays EMPTY by default: a PreToolUse 'ask' is a blocking modal that stalls autonomous work; approval semantics live in the procedural layer (skills/turn Step 2's 'present for approval'). Patterns are regex tested against the Bash command, or the file_path for Edit/Write.",
   "slug": "sift",
-  "channels": ["email"],
-  "deny": [],
+  "channels": [
+    "email"
+  ],
+  "deny": [
+    {
+      "tool_pattern": "^mcp__.*__(?:createJiraIssue|editJiraIssue|transitionJiraIssue|addCommentToJiraIssue|createIssueLink|addWorklogToJiraIssue)$",
+      "_pattern_doc": "Atlassian MCP write tools (any server mount). Reads (getJiraIssue, searchJiraIssuesUsingJql, ...) stay free.",
+      "message": "BLOCKED: Sift never writes to Jira through the Atlassian MCP. Put the change in a plan file and, once a human approves it, run: bin/sift-jira apply <plan.json> --approved-by \"<name>\" (see skills/backlog-triage)."
+    },
+    {
+      "tool": "Bash",
+      "per_statement": true,
+      "_pattern_doc": "Raw HTTP writes to Jira/Atlassian (curl/wget/httpie with a write method or body).",
+      "pattern": "(?s)(?=.*\\b(?:curl|wget|http|https)\\b)(?=.*atlassian\\.(?:net|com))(?=.*(?:-X\\s*(?:POST|PUT|PATCH|DELETE)|--request\\s*(?:POST|PUT|PATCH|DELETE)|--data|--json\\b|\\s-d[\\s'\\\"]|\\b(?:POST|PUT|PATCH|DELETE)\\s+https?://))",
+      "message": "BLOCKED: raw HTTP write to Jira. Sift's only Jira write path is: bin/sift-jira apply <plan.json> --approved-by \"<name>\" (reads: bin/sift-jira search / issue)."
+    },
+    {
+      "tool": "Bash",
+      "per_statement": true,
+      "_pattern_doc": "Jira CLIs' write verbs (Atlassian acli, go-jira / jira-cli).",
+      "pattern": "(?:^|[\\n;&|(])\\s*(?:acli\\s+jira\\s+\\S+\\s+(?:create|edit|transition|comment|assign|delete|link)|jira\\s+(?:issue\\s+)?(?:create|edit|move|transition|comment|assign|link|delete)\\b)",
+      "message": "BLOCKED: Jira CLI write. Sift's only Jira write path is: bin/sift-jira apply <plan.json> --approved-by \"<name>\"."
+    },
+    {
+      "tool_pattern": "(?i)^mcp__.*slack.*__\\w*(?:send_message|schedule_message|post_message|chat_post|reply|create_canvas|update_canvas|add_reaction)",
+      "_pattern_doc": "Slack MCP write tools. Also covers connectors mounted under an opaque id only if 'slack' is in the name; the tool-name rail below catches the rest.",
+      "message": "BLOCKED: Sift never posts to Slack itself. Answer in this turn's reply — canopy-web relays it to the Slack thread that started the turn. To reach someone who didn't ask, put it on the board (/agents/sift) or email via bin/sift-email."
+    },
+    {
+      "tool_pattern": "^mcp__.*__slack_(?:send_message|send_message_draft|schedule_message|create_canvas|update_canvas)$",
+      "_pattern_doc": "claude.ai Slack connector, mounted under a UUID server name.",
+      "message": "BLOCKED: Sift never posts to Slack itself. Answer in this turn's reply — canopy-web relays it to the Slack thread that started the turn. To reach someone who didn't ask, put it on the board (/agents/sift) or email via bin/sift-email."
+    },
+    {
+      "tool": "Bash",
+      "_pattern_doc": "Raw Slack writes: Web API chat/canvas/files writes, incoming webhooks, or SDK calls. Requires an HTTP client / script runner in the command, so a commit message or grep that merely names the API passes.",
+      "pattern": "(?s)^(?=.*\\b(?:curl|wget|https?|python3?|node|npx|deno|bun)\\b)(?=.*(?:slack\\.com/api/(?:chat\\.(?:postMessage|postEphemeral|update|delete|scheduleMessage|meMessage)|files\\.(?:upload|completeUploadExternal)|canvases\\.)|hooks\\.slack\\.com/|\\bchat_(?:postMessage|postEphemeral|update|scheduleMessage)\\b|\\bchat\\.postMessage\\b))",
+      "message": "BLOCKED: Sift never posts to Slack itself and holds no Slack token. Answer in this turn's reply — canopy-web relays it. To reach someone who didn't ask, use the board (/agents/sift) or bin/sift-email."
+    }
+  ],
   "approve": []
 }

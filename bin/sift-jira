@@ -1,0 +1,171 @@
+#!/usr/bin/env python3
+"""Sift's ONLY Jira path — reads free, writes from an approved plan.
+
+Reads (`search`, `issue`) run freely. Writes happen ONLY via `apply`, which executes a
+change plan a human already approved in the turn (skills/turn Step 2). The deny rails in
+config/gating.json block every other Jira write path — Atlassian MCP write tools, raw
+curl/HTTP writes to *.atlassian.net, `acli jira` / `jira` CLI writes — so Jira changes leave
+Sift only through here, each one logged with who approved it.
+
+Usage:
+  bin/sift-jira search --jql "project = CCCT AND statusCategory != Done" [--max 200]
+      -> JSON array of {id, ts, key, summary, status, ...}; pipe into `canopy cursor since`.
+  bin/sift-jira issue CCCT-412            -> one issue, full fields + links + comments
+  bin/sift-jira apply plan.json --approved-by "<name>" [--dry-run]
+
+Plan file (written by skills/backlog-triage):
+  {"title": "...", "changes": [
+     {"key": "CCCT-412", "op": "comment",    "body": "plain text", "why": "..."},
+     {"key": "CCCT-412", "op": "transition", "to": "Won't Do",     "why": "..."},
+     {"key": "CCCT-412", "op": "update",     "fields": {"priority": {"name": "Low"}}, "why": "..."},
+     {"key": "CCCT-412", "op": "link", "type": "Duplicate", "outward": "CCCT-388", "why": "..."}]}
+
+Config (from ~/.sift/.env via bin/_env.py): sift_JIRA_SITE, sift_JIRA_EMAIL,
+sift_JIRA_API_TOKEN, sift_JIRA_PROJECTS.
+"""
+import argparse
+import base64
+import json
+import os
+import sys
+import urllib.error
+import urllib.parse
+import urllib.request
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from _env import get  # noqa: E402
+
+FIELDS = "summary,status,priority,assignee,reporter,issuetype,parent,labels,created,updated,description"
+
+
+def _client():
+    site = get("sift_JIRA_SITE", "dimagi.atlassian.net")
+    email, token = get("sift_JIRA_EMAIL", ""), get("sift_JIRA_API_TOKEN", "")
+    if not (email and token):
+        sys.exit("sift_JIRA_EMAIL / sift_JIRA_API_TOKEN not set — run /sift:setup.")
+    auth = base64.b64encode(f"{email}:{token}".encode()).decode()
+    return f"https://{site}/rest/api/3", {
+        "Authorization": f"Basic {auth}",
+        "Accept": "application/json",
+        "Content-Type": "application/json",
+    }
+
+
+def _call(method, path, body=None, query=None):
+    base, headers = _client()
+    url = base + path + ("?" + urllib.parse.urlencode(query) if query else "")
+    data = json.dumps(body).encode() if body is not None else None
+    req = urllib.request.Request(url, data=data, headers=headers, method=method)
+    try:
+        with urllib.request.urlopen(req, timeout=60) as r:
+            raw = r.read()
+            return json.loads(raw) if raw else {}
+    except urllib.error.HTTPError as e:
+        sys.exit(f"Jira {method} {path} -> {e.code}: {e.read().decode(errors='replace')[:500]}")
+
+
+def _adf(text):
+    """Plain text -> Atlassian Document Format (one paragraph per blank-line block)."""
+    paras = [p for p in text.split("\n\n") if p.strip()]
+    return {"type": "doc", "version": 1, "content": [
+        {"type": "paragraph", "content": [{"type": "text", "text": p.strip()}]} for p in paras]}
+
+
+def _summarize(issue):
+    f = issue["fields"]
+    name = lambda v: (v or {}).get("displayName") or (v or {}).get("name")  # noqa: E731
+    return {
+        "id": issue["key"], "ts": f.get("updated"), "key": issue["key"],
+        "summary": f.get("summary"), "status": name(f.get("status")),
+        "priority": name(f.get("priority")), "type": name(f.get("issuetype")),
+        "assignee": name(f.get("assignee")), "reporter": name(f.get("reporter")),
+        "parent": (f.get("parent") or {}).get("key"), "labels": f.get("labels") or [],
+        "created": f.get("created"), "has_description": bool(f.get("description")),
+    }
+
+
+def cmd_search(a):
+    out, token = [], None
+    while len(out) < a.max:
+        q = {"jql": a.jql, "fields": FIELDS, "maxResults": min(100, a.max - len(out))}
+        if token:
+            q["nextPageToken"] = token
+        page = _call("GET", "/search/jql", query=q)
+        out += [_summarize(i) for i in page.get("issues", [])]
+        token = page.get("nextPageToken")
+        if not token:
+            break
+    json.dump(out, sys.stdout, indent=1)
+    print()
+
+
+def cmd_issue(a):
+    json.dump(_call("GET", f"/issue/{a.key}", query={"fields": "*all", "expand": "renderedFields"}),
+              sys.stdout, indent=1)
+    print()
+
+
+def _apply_one(c):
+    key, op = c["key"], c["op"]
+    if op == "comment":
+        _call("POST", f"/issue/{key}/comment", {"body": _adf(c["body"])})
+    elif op == "update":
+        _call("PUT", f"/issue/{key}", {"fields": c["fields"]})
+    elif op == "transition":
+        ts = _call("GET", f"/issue/{key}/transitions")["transitions"]
+        want = c["to"].lower()
+        hit = next((t for t in ts if t["to"]["name"].lower() == want or t["name"].lower() == want), None)
+        if not hit:
+            raise ValueError(f"no transition to {c['to']!r}; available: {[t['to']['name'] for t in ts]}")
+        _call("POST", f"/issue/{key}/transitions", {"transition": {"id": hit["id"]}})
+    elif op == "link":
+        _call("POST", "/issueLink", {"type": {"name": c["type"]},
+                                     "inwardIssue": {"key": key}, "outwardIssue": {"key": c["outward"]}})
+    else:
+        raise ValueError(f"unknown op {op!r}")
+
+
+def cmd_apply(a):
+    if not a.approved_by.strip():
+        sys.exit("--approved-by is required: name the human who approved this plan.")
+    plan = json.load(open(a.plan, encoding="utf-8"))
+    changes = plan.get("changes") or []
+    results = []
+    for c in changes:
+        line = {"key": c.get("key"), "op": c.get("op"), "why": c.get("why")}
+        if a.dry_run:
+            results.append({**line, "result": "dry-run"})
+            continue
+        try:
+            _apply_one(c)
+            results.append({**line, "result": "ok"})
+        except (ValueError, KeyError, SystemExit) as e:
+            results.append({**line, "result": f"error: {e}"})
+    json.dump({"plan": plan.get("title"), "approved_by": a.approved_by, "dry_run": a.dry_run,
+               "applied": sum(r["result"] == "ok" for r in results), "results": results},
+              sys.stdout, indent=1)
+    print()
+    sys.exit(1 if any(r["result"].startswith("error") for r in results) else 0)
+
+
+def main():
+    p = argparse.ArgumentParser(prog="sift-jira", description=__doc__.split("\n\n")[0])
+    sub = p.add_subparsers(dest="cmd", required=True)
+    s = sub.add_parser("search")
+    s.add_argument("--jql", required=True)
+    s.add_argument("--max", type=int, default=200)
+    s.set_defaults(fn=cmd_search)
+    i = sub.add_parser("issue")
+    i.add_argument("key")
+    i.set_defaults(fn=cmd_issue)
+    ap = sub.add_parser("apply")
+    ap.add_argument("plan")
+    ap.add_argument("--approved-by", required=True)
+    ap.add_argument("--dry-run", action="store_true")
+    ap.set_defaults(fn=cmd_apply)
+    a = p.parse_args()
+    a.fn(a)
+
+
+if __name__ == "__main__":
+    main()
