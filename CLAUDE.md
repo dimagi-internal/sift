@@ -43,13 +43,13 @@ Sift's web workspace is `/agents/sift` on canopy-web.
 - Capability logic belongs in CLIs / MCP tools; skills (`SKILL.md`) orchestrate. That keeps the
   agent portable to the Claude Agent SDK later (MCP is the portability boundary).
 - Config/secrets live in a WORKTREE-CLEAN global home `~/.sift/.env`, filled by
-  `/sift:setup` (`canopy agent env --plugin sift`) from `.env.tpl` (1Password
-  refs + non-secret literals — never a literal `op://…` in a comment, it gets resolved too). NOT
+  `/sift:setup` (`canopy agent env --plugin sift`) from the agent's
+  Canopy vault on canopy-web (Settings → Credentials). NOT
   a per-worktree repo `.env` (that gets recreated every turn). Scripts read it via `bin/_env.py`.
-- **The vault is never named in this repo.** A plugin is code; an *instance* is canopy-web's
-  Agent record (identity, workspace, 1Password vault). `.env.tpl` refs read
-  `op://${AGENT_VAULT}/<item>/<field>`; setup binds this install to ONE instance and sets
-  `AGENT_VAULT` to the vault canopy-web records for it. Using another instance = run setup again.
+- **This repo names no secret.** A plugin is code; an *instance* is canopy-web's Agent record
+  (identity, workspace, Canopy vault). Every secret is stored in the agent's Canopy vault
+  (canopy-web → Settings → Credentials); setup binds this install to ONE instance and fills
+  `~/.sift/.env` from it. Using another instance = run setup again.
 - Outputs that are deliverables live where the team can see them (a shared drive / the canopy-web
   workspace), not as loose local files.
 

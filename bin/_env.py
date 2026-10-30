@@ -1,7 +1,7 @@
 """Canonical .env resolver for Sift's scripts — reads the WORKTREE-CLEAN global home.
 
 Sift runs each turn in a fresh emdash worktree; a per-repo `.env` would be absent there and
-get recreated every turn. So secrets live ONCE at ~/.sift/.env (filled from .env.tpl
+get recreated every turn. So secrets live ONCE at ~/.sift/.env (filled from the Canopy vault
 by /sift:setup — `canopy agent env --plugin sift`; override the home with
 $sift_ENV, upper-cased). A repo-local `.env` still works as a per-KEY dev override (it wins).
 
