@@ -76,3 +76,5 @@ that's a change to a principle, not an addition.
 On a monthly cadence (or when asked "what should we add to the principles?"), roll up the
 candidates collected since the last review, plus any repeated conflicts from triage. Present
 them as one numbered batch for the owner to pick from. Never edit the page without that pick.
+After the review, record the date: `date +%F > ~/.sift/state/principles-review` (the Tuesday
+schedule reads it to decide whether the monthly review is due).

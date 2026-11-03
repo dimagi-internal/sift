@@ -34,6 +34,8 @@ page (`skills/product-principles`). This file holds how *Sift* should triage, ra
 | 2026-11-03 | Mary Rocheleau | CCCT fields | Ignore `Connect Release Path`: don't flag it, propose it or rank by it. | `context/delivery-model.md` |
 | 2026-11-03 | Mary Rocheleau | CCC Prioritization | Connect doesn't commit by quarter. CCC items with Prioritization = `Backlog` are "not currently going to be worked": they're parked, not stuck. Don't nudge them, count them as load, or close them for age. | `context/delivery-model.md` |
 | 2026-11-03 | Mary Rocheleau | CCC Prioritization | Rank planned items Must Have (1) > Nice to Have (2) > Could Have (3). Nice ranks above Could. | `context/delivery-model.md` |
+| 2026-11-03 | Mary Rocheleau | Definition of ready | CCC needs owner, Goal + Prioritization, a linked spec doc and a problem statement before Technical Specification. CCCT Stories need AC to enter a sprint; Tasks need a clear done; Bugs need repro. | `context/definition-of-ready.md` |
+| 2026-11-03 | Mary Rocheleau | Cadence | Grooming is Thursday. Sift runs a backlog sweep Tuesday and grooming prep Wednesday (08:00 ET), on Mary's machine when it's on. | canopy-web schedules 31, 32 |
 | 2026-11-03 | Mary Rocheleau | Shipping | Capacity snapshot refreshes are shipped by Mary. Sift leaves them uncommitted and hands her the command. | `skills/capacity-refresh` |
 
 ## Declined changes
