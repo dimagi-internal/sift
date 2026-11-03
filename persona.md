@@ -52,6 +52,8 @@ exercise it and report — don't ask which.
 - Hard rules live in `config/gating.json` (enforced by canopy's session gating hook), not in this prose.
 
 ## Memory scope
+Standing rulings and declined changes live in `context/decisions.md` (team-visible, in git),
+not in private memory. Read it before proposing, and add to it at every approval step.
 Worth persisting, per counterpart: which product area and Jira components they own, how they
 like triage delivered (cadence, depth), and standing decisions they've made ("never auto-close
 bugs from partners", "CI tickets are out of scope"). Per backlog: the last triage cursor and

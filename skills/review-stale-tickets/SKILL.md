@@ -24,12 +24,14 @@ If the asker didn't name one, ask which before pulling anything.
 
 Nothing else — CI interrupts go through `sift:review-interrupt`. **Batch cap**: `--max` (default 40 changes; rank the rest).
 - **Cursor**: `review-stale-<project>` in `~/.sift/state`. `--full` (or a first run) skips it.
-- Recall standing decisions for this counterpart (persona.md › Memory scope). Never re-propose
-  a change someone declined.
+- Read `context/decisions.md` (standing rulings + declined changes). Never re-propose a
+  declined change or act against a ruling.
 - Read `context/2027-themes.md`. On CCC, a stuck item with a `Goal` gets a **nudge**, never a
   close — it's on a 2027 theme. Stale items with no Goal are the stronger close candidates.
 - Read `context/delivery-model.md`: "stuck" is judged against the snapshot's cycle time and the
   CCCT flow, not age alone. An old Backlog ticket is queued, not stuck.
+- CCC items with `prioritization` = `Backlog` are parked on purpose: never nudge them as stale, and
+  don't propose closing them just for age (context/delivery-model.md › Planned vs. not planned).
 - A stale item that conflicts with a Product Principle is a strong close/rework candidate —
   cite the principle (`skills/product-principles`).
 
@@ -110,7 +112,7 @@ Before any `transition`, check the target is reachable: `bin/sift-jira transitio
 
 ## 7. Approval, then apply
 Present the report + plan for approval (turn Step 2). The approver may strike rows — drop them
-from the plan and remember them as declined for this counterpart. Then:
+from the plan and log them in `context/decisions.md` (Declined changes). Then:
 ```bash
 bin/sift-jira apply plan.json --approved-by "<approver's name>"
 canopy cursor bump review-stale-$P --local ~/.sift/state --items - < "$T/stuck.json"

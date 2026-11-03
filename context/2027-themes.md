@@ -104,8 +104,10 @@ partners and funders see their own data without asking Dimagi.
   and call out the in-flight ones (Prioritized / Implementation / Technical Spec) — those are
   the ones a PM should either tie to a goal or deprioritize. Don't propose closing an item just
   because it has no goal.
-- **Coverage gaps.** For each goal, check whether its metric and its listed work have items
-  behind them. A goal whose metric has no tagged in-flight item gets flagged.
+- **Coverage gaps.** For each goal, check whether its metric and its listed work have
+  **planned** items behind them (CCC `Prioritization` set and not `Backlog`; see
+  `context/delivery-model.md`). A goal whose metric has only parked (`Backlog`) items, or none,
+  gets flagged. Report parked goal-tagged items as "on-goal, not planned".
 - **Stale reviews.** A goal-tagged item that's stuck gets a nudge to its owner, not a close.
 - **CCCT.** Delivery work inherits its goal from the CCC item its epic implements; use that to
   rank delivery tickets, but don't write Goal onto CCCT.

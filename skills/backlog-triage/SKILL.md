@@ -25,8 +25,8 @@ Capability lives in `bin/sift-jira`; this skill is the judgment around it.
 - Projects: `sift_JIRA_PROJECTS` (default `CCC,CCCT`). `CI` (Connect Interrupt) is out of scope
   here — it gets its own weekly `sift:review-interrupt` run.
 - If the asker named a narrower slice (an epic, a component, "just bugs"), use that and say so.
-- Recall standing decisions for this counterpart (persona.md › Memory scope) — e.g. changes
-  they've already declined. Never re-propose a rejected change.
+- Read `context/decisions.md`: standing rulings and declined changes. Never re-propose a
+  declined change or act against a ruling.
 
 ## 2. Pull candidates (read-only)
 Run these and keep the JSON; each row is `{id, ts, key, summary, status, priority, type,
@@ -62,8 +62,12 @@ Every open CCC item should carry:
 | Product Area (`customfield_10448`) | non-empty | `update` from the summary / linked CCC items; `{"customfield_10448": [{"value": "…"}]}` |
 | Platform (`customfield_10434`) | `Web` and/or `Mobile` | `update`; `{"customfield_10434": [{"value": "Web"}]}` |
 | Goal (`customfield_14111`) | set, or a deliberate "none" | **never write unprompted** — list candidates per theme (numbered, so the PM can pick) and apply only what she picks |
+| Prioritization (`customfield_12800`) | set on anything past `Backlog` status; `Backlog` value never on an in-flight item | propose a value, never write unprompted |
 
 Report: open CCC items with no Goal (count), and the in-flight ones by name.
+
+Planned = Prioritization set and not `Backlog`. Parked (`Backlog`) items are excluded from drift,
+staleness and capacity checks — see `context/delivery-model.md` › Planned vs. not planned.
 
 ### CCCT hygiene — classification rules
 Every CCCT ticket must also pass these. They are the most common findings, so check them on
@@ -105,7 +109,8 @@ about — say how many you skipped and why, rather than proposing a weak change.
 
 ## 5. Approval, then apply
 Present the report + plan for approval per the turn's Step 2 ("present for approval"). The
-approver may strike lines — remove them from the plan (and remember them as declined). Then:
+approver may strike lines — remove them from the plan and log each in `context/decisions.md`
+(Declined changes; any rule they state goes under Standing rulings). Then:
 ```bash
 bin/sift-jira apply plan.json --approved-by "<approver's name>"
 ```
