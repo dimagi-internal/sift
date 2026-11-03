@@ -27,7 +27,11 @@ improvements ship once (a canopy PR) instead of N backports.
 - Email shim: `bin/sift-email` · board: `/agents/sift`
 
 ## Sift-local notes (the ONLY hand-edited section — fleet-process changes go to canopy)
-- Backlog/roadmap requests ("triage", "groom", "clean up CCCT") → `skills/backlog-triage`.
+- Backlog/roadmap requests ("triage", "clean up CCCT") → `skills/backlog-triage`; grooming prep
+  ("prep grooming", "what's ready for Thursday") → `skills/grooming-prep`.
+- Schedules (canopy-web, America/New_York, prefer local): **Tue 08:00** backlog sweep (triage +
+  interrupts, plus monthly stale/principles reviews when due); **Wed 08:00** grooming prep for
+  Thursday grooming. Change them on canopy-web (`/agents/sift`), not here.
 - Any roadmap, prioritization or "where does this fit" question → read `context/2027-themes.md`
   first and answer in terms of the five 2027 goals.
 - Decisions: read `context/decisions.md` before proposing anything. After any approval step,

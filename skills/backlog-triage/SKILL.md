@@ -49,7 +49,7 @@ Check each open ticket against these signals; a ticket can hit several but gets 
 |---|---|---|
 | Stale | no status change in 90+ days | run `sift:review-stale-tickets` for that project — its rules, not a blanket close |
 | Duplicate | same problem as another open ticket (read both) | `link` Duplicate → keeper, `transition` the dup |
-| Under-specified | no description or no acceptance criteria, In Progress / Ready | `comment` asking the reporter for AC |
+| Under-specified | fails `context/definition-of-ready.md`: CCCT in a current/next sprint or In Progress; CCC in Technical Specification or later (owner, Goal + Prioritization, spec link, problem statement) | `comment` with the drafted fix (AC, repro questions, problem statement) |
 | Unowned | In Progress with no assignee | `comment` @reporter, flag in report |
 | Priority drift | priority higher than its roadmap item's, or High on a stale ticket | `update` priority |
 | Empty roadmap item | CCC item In Progress with no linked CCCT work | flag for the owning PM |
