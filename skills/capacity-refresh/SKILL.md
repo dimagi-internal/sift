@@ -65,5 +65,10 @@ Then compare with the previous snapshot (`git diff`). Put anything that moved en
 a recommendation in the turn report, in one line each. Examples: velocity down more than 20%,
 a pod's capacity cut by PTO, interrupt cycle time spiking, commitment far above estimate.
 
-Ship it like any other repo change (`skills/shipping`). It's a context file, so a direct
-commit to a branch, a PR and a self-merge are fine.
+**Don't push it yourself.** The auto-mode permission check blocks committing capacity data
+(Mary decided 2026-11-03 to ship these herself). Leave the rewritten snapshot uncommitted.
+End the turn report with this single command for her to run:
+
+```bash
+cd ~/emdash-projects/sift && git checkout -b context/capacity-<YYYY-MM-DD> && git add context/capacity-snapshot.md && git commit -m "Refresh capacity snapshot (<sprint>)" && git push -u origin HEAD && gh pr create --fill && gh pr merge --squash --delete-branch
+```
