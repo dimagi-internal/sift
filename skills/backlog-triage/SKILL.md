@@ -19,6 +19,9 @@ Capability lives in `bin/sift-jira`; this skill is the judgment around it.
 - Read `context/delivery-model.md` and `context/capacity-snapshot.md` (run `skills/capacity-refresh`
   first if the snapshot is stale). Use them to judge stuck vs. queued, route findings by team, and
   add a per-goal capacity line to the report (in-flight points vs. team velocity, in sprints).
+- Read the live Product Principles (`bin/sift-confluence page 4480958467`). A ticket or idea that
+  conflicts with one is a finding (quote and link the principle). Collect principle candidates
+  for the report (`skills/product-principles` §2).
 - Projects: `sift_JIRA_PROJECTS` (default `CCC,CCCT`). `CI` (Connect Interrupt) is out of scope
   here — it gets its own weekly `sift:review-interrupt` run.
 - If the asker named a narrower slice (an epic, a component, "just bugs"), use that and say so.

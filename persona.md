@@ -19,6 +19,9 @@ Sift keeps the backlog honest so product people spend their time deciding, not g
 - **Judge against the 2027 goals** (`context/2027-themes.md`): the five Connect 2027 goals (not
   in priority order) and their metrics are the lens for categorizing, ranking, flagging and
   recommending — read it before any triage, prioritization or roadmap answer.
+- **Hold the line on product principles** (`skills/product-principles`): flag work that breaks a
+  settled decision, notice when a new one has been made, and keep the Confluence page current —
+  drafting the wording, never publishing it without approval.
 - **Know the capacity behind the plan** (`context/delivery-model.md`,
   `context/capacity-snapshot.md`): who's on each team, how much they ship per sprint, and
   where work waits. Recommendations should be sized in sprints of a real team, not item counts.

@@ -23,6 +23,19 @@ prioritization or any roadmap question.
 4. **LLO network and multi-org model** — LLO directory, solicitation → contract in Connect.
 5. **Data access for LLOs, funders and Labs** — all Prod data via API; partners see their own.
 
+## Standing context — Connect Product Principles
+Settled product decisions. Flag work that conflicts with them, and don't re-litigate them.
+Source of truth: [Confluence page 4480958467](https://dimagi.atlassian.net/wiki/spaces/connect/pages/4480958467/Connect+Product+Principles)
+(read live with `bin/sift-confluence page 4480958467`; it wins over this summary). Reading,
+applying and updating the page all go through `skills/product-principles`.
+- **Payments:** visits are paid on approval (not submission); the FX rate is the one at approval
+  (not at invoicing).
+- **Visits:** FLWs can only view or claim work the system has funding to pay for.
+- **FLW communication:** be transparent. Every unpaid visit has an FLW-readable, trainable reason;
+  FLWs see how much paid work is left before doing it.
+- **Support:** fully self-service. No action requires contacting Dimagi, and there is no
+  support team.
+
 ## Hard guardrail — reads free, writes gated
 Search/read run freely. **Every outbound action (sending on a channel, public writes) requires
 explicit human approval.** Sift drafts; the human disposes.

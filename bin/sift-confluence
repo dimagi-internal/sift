@@ -1,0 +1,127 @@
+#!/usr/bin/env python3
+"""Sift's ONLY Confluence path — reads free, writes from an approved plan.
+
+Reads (`page`) run freely. Writes happen ONLY via `apply`, which executes a page-update plan a
+human already approved in the turn. The deny rails in config/gating.json block the Atlassian
+MCP Confluence write tools (and raw HTTP writes to *.atlassian.net), so page edits leave Sift
+only through here, each one stamped with who approved it in the page's version message.
+
+Usage:
+  bin/sift-confluence page 4480958467                 -> {id, title, version, url, text}
+  bin/sift-confluence page 4480958467 --storage FILE  -> also write the storage-format body to FILE
+  bin/sift-confluence apply plan.json --approved-by "<name>" [--dry-run]
+
+Plan file (written by skills/product-principles):
+  {"page_id": "4480958467", "base_version": 3, "summary": "Add principle: …",
+   "body_file": "/abs/path/new-body.storage.html"}
+`base_version` is the version the edit was drafted against. If the page has moved on since,
+apply refuses (someone else edited it) — re-read, redraft, re-approve.
+`--dry-run` prints a text diff of current vs. proposed and changes nothing.
+
+Auth: the same Atlassian credentials as bin/sift-jira (sift_JIRA_SITE / _EMAIL / _API_TOKEN).
+"""
+import argparse
+import difflib
+import html
+import importlib.machinery
+import json
+import os
+import re
+import sys
+import urllib.error
+import urllib.request
+
+_HERE = os.path.dirname(os.path.abspath(__file__))
+_jira = importlib.machinery.SourceFileLoader("sift_jira", os.path.join(_HERE, "sift-jira")).load_module()
+
+
+def _call(method, path, body=None):
+    base, headers = _jira._client()
+    url = base.replace("/rest/api/3", "/wiki/api/v2") + path
+    data = json.dumps(body).encode() if body is not None else None
+    req = urllib.request.Request(url, data=data, headers=headers, method=method)
+    try:
+        with urllib.request.urlopen(req, timeout=60) as r:
+            raw = r.read()
+            return json.loads(raw) if raw else {}
+    except urllib.error.HTTPError as e:
+        sys.exit(f"Confluence {method} {path} -> {e.code}: {e.read().decode(errors='replace')[:500]}")
+
+
+def _get(page_id):
+    return _call("GET", f"/pages/{page_id}?body-format=storage")
+
+
+def _text(storage):
+    """Storage XHTML -> readable plain text (headings and bullets kept)."""
+    s = re.sub(r"<ac:parameter[^>]*>.*?</ac:parameter>", "", storage, flags=re.S)
+    s = re.sub(r"<h(\d)[^>]*>", lambda m: "\n" + "#" * int(m.group(1)) + " ", s)
+    s = re.sub(r"</h\d>", "\n", s)
+    s = re.sub(r"<li[^>]*>", "\n- ", s)
+    s = re.sub(r"</(p|li|ul|ol|tr)>", "\n", s)
+    s = re.sub(r"<ac:link-body>(.*?)</ac:link-body>", r"\1", s)
+    s = re.sub(r"<[^>]+>", "", s)
+    s = html.unescape(s)
+    return re.sub(r"\n\s*\n+", "\n\n", s).strip()
+
+
+def cmd_page(a):
+    p = _get(a.page_id)
+    storage = p["body"]["storage"]["value"]
+    if a.storage:
+        with open(a.storage, "w", encoding="utf-8") as f:
+            f.write(storage)
+    site = _jira.get("sift_JIRA_SITE", "dimagi.atlassian.net")
+    json.dump({"id": p["id"], "title": p["title"], "version": p["version"]["number"],
+               "updated": p["version"].get("createdAt"),
+               "url": f"https://{site}/wiki{p.get('_links', {}).get('webui', '')}",
+               "text": _text(storage)}, sys.stdout, indent=1)
+    print()
+
+
+def cmd_apply(a):
+    if not a.approved_by.strip():
+        sys.exit("--approved-by is required: name the human who approved this edit.")
+    plan = json.load(open(a.plan, encoding="utf-8"))
+    pid, base = str(plan["page_id"]), int(plan["base_version"])
+    new_body = open(plan["body_file"], encoding="utf-8").read()
+    cur = _get(pid)
+    cur_v = cur["version"]["number"]
+    if cur_v != base:
+        sys.exit(f"REFUSED: page {pid} is at version {cur_v}, plan was drafted against {base}. "
+                 "Someone edited it — re-read, redraft and get the edit re-approved.")
+    old_text, new_text = _text(cur["body"]["storage"]["value"]), _text(new_body)
+    diff = "\n".join(difflib.unified_diff(old_text.splitlines(), new_text.splitlines(),
+                                          f"v{cur_v}", "proposed", lineterm=""))
+    if a.dry_run:
+        print(diff or "(no text change)")
+        return
+    msg = f"Sift: {plan.get('summary', 'update')} (approved by {a.approved_by})"[:250]
+    res = _call("PUT", f"/pages/{pid}", {
+        "id": pid, "status": "current", "title": plan.get("title") or cur["title"],
+        "body": {"representation": "storage", "value": new_body},
+        "version": {"number": cur_v + 1, "message": msg}})
+    json.dump({"page_id": pid, "from_version": cur_v, "to_version": res["version"]["number"],
+               "approved_by": a.approved_by, "summary": plan.get("summary"), "diff": diff},
+              sys.stdout, indent=1)
+    print()
+
+
+def main():
+    p = argparse.ArgumentParser(prog="sift-confluence", description=__doc__.split("\n\n")[0])
+    sub = p.add_subparsers(dest="cmd", required=True)
+    g = sub.add_parser("page")
+    g.add_argument("page_id")
+    g.add_argument("--storage", help="write the storage-format body to this file")
+    g.set_defaults(fn=cmd_page)
+    ap = sub.add_parser("apply")
+    ap.add_argument("plan")
+    ap.add_argument("--approved-by", required=True)
+    ap.add_argument("--dry-run", action="store_true")
+    ap.set_defaults(fn=cmd_apply)
+    a = p.parse_args()
+    a.fn(a)
+
+
+if __name__ == "__main__":
+    main()
