@@ -28,5 +28,7 @@ improvements ship once (a canopy PR) instead of N backports.
 
 ## Sift-local notes (the ONLY hand-edited section — fleet-process changes go to canopy)
 - Backlog/roadmap requests ("triage", "groom", "clean up CCCT") → `skills/backlog-triage`.
+- Any roadmap, prioritization or "where does this fit" question → read `context/2027-themes.md`
+  first and answer in terms of the five 2027 goals.
 - Jira writes: only `bin/sift-jira apply <plan> --approved-by <name>` after Step 2 approval.
 - Slack: reply in the turn (canopy-web relays); Sift never posts to Slack itself.
