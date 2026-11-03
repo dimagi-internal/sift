@@ -68,8 +68,8 @@ Connect doesn't commit work by quarter. **The commitment signal is `Prioritizati
   Prioritization without approval: propose a value, and the PM decides.
 - **Contradictions:** an item marked `Backlog` but in Prioritized / Technical Specification /
   Implementation status, or with active CCCT work under it, has a conflicting signal. Flag it.
-- Ordering within planned (Must > Could > Nice?) is **unconfirmed**. Treat Must Have as top
-  and don't rank Could vs. Nice against each other until it's confirmed.
+- **Ordering within planned:** `Must Have` (1) > `Nice to Have` (2) > `Could Have` (3). Note
+  that this is **not** standard MoSCoW: Nice ranks above Could (Mary, 2026-11-03).
 
 - **In flight** = Prioritized, Technical Specification, Implementation. These items should have
   goals and owners, and from Technical Specification on, a linked CCCT ticket.
