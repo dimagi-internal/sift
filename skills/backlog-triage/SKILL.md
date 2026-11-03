@@ -16,6 +16,9 @@ Capability lives in `bin/sift-jira`; this skill is the judgment around it.
 ## 1. Scope the sweep
 - Read `context/2027-themes.md` first — the five 2027 themes are the lens for every judgment
   below (what counts as drift, what to rank first, which gaps to flag).
+- Read `context/delivery-model.md` and `context/capacity-snapshot.md` (run `skills/capacity-refresh`
+  first if the snapshot is stale). Use them to judge stuck vs. queued, route findings by team, and
+  add a per-goal capacity line to the report (in-flight points vs. team velocity, in sprints).
 - Projects: `sift_JIRA_PROJECTS` (default `CCC,CCCT`). `CI` (Connect Interrupt) is out of scope
   here — it gets its own weekly `sift:review-interrupt` run.
 - If the asker named a narrower slice (an epic, a component, "just bugs"), use that and say so.
