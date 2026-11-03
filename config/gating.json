@@ -25,6 +25,11 @@
       "message": "BLOCKED: Jira CLI write. Sift's only Jira write path is: bin/sift-jira apply <plan.json> --approved-by \"<name>\"."
     },
     {
+      "tool_pattern": "^mcp__.*__(?:createConfluencePage|updateConfluencePage|createConfluenceFooterComment|createConfluenceInlineComment)$",
+      "_pattern_doc": "Atlassian MCP Confluence write tools (any server mount). Reads (getConfluencePage, search…) stay free.",
+      "message": "BLOCKED: Sift never writes to Confluence through the Atlassian MCP. Draft the edit (bin/sift-confluence page <id> --storage FILE, edit FILE), get it approved, then run: bin/sift-confluence apply <plan.json> --approved-by \"<name>\" (see skills/product-principles)."
+    },
+    {
       "tool_pattern": "(?i)^mcp__.*slack.*__\\w*(?:send_message|schedule_message|post_message|chat_post|reply|create_canvas|update_canvas|add_reaction)",
       "_pattern_doc": "Slack MCP write tools. Also covers connectors mounted under an opaque id only if 'slack' is in the name; the tool-name rail below catches the rest.",
       "message": "BLOCKED: Sift never posts to Slack itself. Answer in this turn's reply — canopy-web relays it to the Slack thread that started the turn. To reach someone who didn't ask, put it on the board (/agents/sift) or email via bin/sift-email."

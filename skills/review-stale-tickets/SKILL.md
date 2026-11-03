@@ -30,6 +30,8 @@ Nothing else — CI interrupts go through `sift:review-interrupt`. **Batch cap**
   close — it's on a 2027 theme. Stale items with no Goal are the stronger close candidates.
 - Read `context/delivery-model.md`: "stuck" is judged against the snapshot's cycle time and the
   CCCT flow, not age alone. An old Backlog ticket is queued, not stuck.
+- A stale item that conflicts with a Product Principle is a strong close/rework candidate —
+  cite the principle (`skills/product-principles`).
 
 ## 2. Pull candidates — "stuck", not just "untouched"
 `updated` is a weak signal: a comment, a bulk edit or a sprint sweep resets it without the
