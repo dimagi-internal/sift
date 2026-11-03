@@ -30,5 +30,8 @@ improvements ship once (a canopy PR) instead of N backports.
 - Backlog/roadmap requests ("triage", "groom", "clean up CCCT") → `skills/backlog-triage`.
 - Any roadmap, prioritization or "where does this fit" question → read `context/2027-themes.md`
   first and answer in terms of the five 2027 goals.
+- Capacity: if `context/capacity-snapshot.md` is over 14 days old or its sprint has ended, run
+  `skills/capacity-refresh` before triage or prioritization work. Size work with
+  `context/delivery-model.md` + the snapshot (team rosters, velocity, capacity notes).
 - Jira writes: only `bin/sift-jira apply <plan> --approved-by <name>` after Step 2 approval.
 - Slack: reply in the turn (canopy-web relays); Sift never posts to Slack itself.

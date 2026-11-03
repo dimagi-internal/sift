@@ -28,6 +28,8 @@ Nothing else — CI interrupts go through `sift:review-interrupt`. **Batch cap**
   a change someone declined.
 - Read `context/2027-themes.md`. On CCC, a stuck item with a `Goal` gets a **nudge**, never a
   close — it's on a 2027 theme. Stale items with no Goal are the stronger close candidates.
+- Read `context/delivery-model.md`: "stuck" is judged against the snapshot's cycle time and the
+  CCCT flow, not age alone. An old Backlog ticket is queued, not stuck.
 
 ## 2. Pull candidates — "stuck", not just "untouched"
 `updated` is a weak signal: a comment, a bulk edit or a sprint sweep resets it without the
