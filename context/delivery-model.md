@@ -47,6 +47,30 @@ and are kept fresh by `skills/capacity-refresh`. This file holds what changes ra
 ## CCC (roadmap) flow: Jira Product Discovery ideas
 `Backlog` → `Defining Requirements` → `Requirements Validation` → `Prioritized` →
 `Technical Specification` → `Implementation` → done.
+### Planned vs. not planned: the `Prioritization` field (`customfield_12800`)
+Connect doesn't commit work by quarter. **The commitment signal is `Prioritization`** on CCC
+(Mary, 2026-11-03):
+
+| Prioritization | Meaning | Open CCC (2026-11-03) |
+|---|---|---|
+| `Backlog` | **Not currently going to be worked.** Parked on purpose. | 117 (none in flight) |
+| `Must Have` / `Could Have` / `Nice to Have` | Planned: this is the roadmap. | 34 / 33 / 37 |
+| *(unset)* | No call made yet. Mostly new ideas. | 44 |
+
+- **Planned** = Prioritization is set and isn't `Backlog`. That's the work Sift sizes against
+  capacity, ranks by goal, and expects to move.
+- **`Backlog` items aren't stuck, aren't drift and aren't a capacity load.** Don't nudge them
+  for staleness and don't count them in per-goal capacity. A goal-tagged `Backlog` item is
+  "on-goal, not planned". Report it under coverage ("goal 05 has 4 parked items"), never as a
+  defect. Don't propose closing an item just because it's parked.
+- **Unset is a finding.** Any CCC item past `Backlog` status with no Prioritization needs a call.
+  For new ideas, list them as "awaiting a prioritization call", not as errors. Never set
+  Prioritization without approval: propose a value, and the PM decides.
+- **Contradictions:** an item marked `Backlog` but in Prioritized / Technical Specification /
+  Implementation status, or with active CCCT work under it, has a conflicting signal. Flag it.
+- Ordering within planned (Must > Could > Nice?) is **unconfirmed**. Treat Must Have as top
+  and don't rank Could vs. Nice against each other until it's confirmed.
+
 - **In flight** = Prioritized, Technical Specification, Implementation. These items should have
   goals and owners, and from Technical Specification on, a linked CCCT ticket.
 - An idea links to its delivery epic through a **`Polaris work item link`** (CCC ↔ CCCT). An
@@ -71,7 +95,7 @@ and are kept fresh by `skills/capacity-refresh`. This file holds what changes ra
 - Blocked tickets need a named blocker (a link or a comment). Blocked with neither is a finding.
 
 ## How Sift uses it
-- **Capacity check per goal.** Sum the points (or the count, if unestimated) of in-flight work
+- **Capacity check per goal.** Sum the points (or the count, if unestimated) of planned and in-flight work
   under each 2027 goal, by team. Compare that against the team's velocity in the snapshot and
   express it in sprints, e.g. "goal 02 has ~4 sprints of Web work queued".
   Flag a goal that is many sprints deep on one team, or a team carrying most goals at once.

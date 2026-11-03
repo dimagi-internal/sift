@@ -26,8 +26,8 @@ role moves.
 - **Cadence: weekly.** No cursor — every run looks at every open interrupt again, including the
   ones nudged last week that still haven't moved.
 - `--days` (default 14) = "not moving" threshold. `--max` (default 40 changes).
-- Recall standing decisions for this counterpart (persona.md › Memory scope). Never re-propose
-  a change someone declined.
+- Read `context/decisions.md` (standing rulings + declined changes). Never re-propose a
+  declined change or act against a ruling.
 
 ## 2. Pull candidates — three searches
 An interrupt can be moving and still be in trouble, so one query isn't enough:
@@ -117,7 +117,7 @@ Before any `transition`, check the target is reachable: `bin/sift-jira transitio
 
 ## 8. Approval, then apply
 Present the report + plan for approval (turn Step 2). The approver may strike rows — drop them
-and remember them as declined for this counterpart. Then
+and log them in `context/decisions.md` (Declined changes). Then
 `bin/sift-jira apply plan.json --approved-by "<approver's name>"` and report what applied and
 what errored, one line each.
 

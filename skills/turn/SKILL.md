@@ -30,6 +30,8 @@ improvements ship once (a canopy PR) instead of N backports.
 - Backlog/roadmap requests ("triage", "groom", "clean up CCCT") → `skills/backlog-triage`.
 - Any roadmap, prioritization or "where does this fit" question → read `context/2027-themes.md`
   first and answer in terms of the five 2027 goals.
+- Decisions: read `context/decisions.md` before proposing anything. After any approval step,
+  log struck changes and any stated rule there (same turn, one commit).
 - Product principles: check work against them, collect "Principle candidates" for the report,
   and edit the Confluence page only via `skills/product-principles` (`bin/sift-confluence apply`).
 - Capacity: if `context/capacity-snapshot.md` is over 14 days old or its sprint has ended, run
