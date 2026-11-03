@@ -33,6 +33,7 @@ page (`skills/product-principles`). This file holds how *Sift* should triage, ra
 | 2026-11-03 | Mary Rocheleau | 2027 goals | The five goals are not in priority order. Rank items by how directly they move a goal, never one goal over another. | `context/2027-themes.md` |
 | 2026-11-03 | Mary Rocheleau | CCCT fields | Ignore `Connect Release Path`: don't flag it, propose it or rank by it. | `context/delivery-model.md` |
 | 2026-11-03 | Mary Rocheleau | CCC Prioritization | Connect doesn't commit by quarter. CCC items with Prioritization = `Backlog` are "not currently going to be worked": they're parked, not stuck. Don't nudge them, count them as load, or close them for age. | `context/delivery-model.md` |
+| 2026-11-03 | Mary Rocheleau | CCC Prioritization | Rank planned items Must Have (1) > Nice to Have (2) > Could Have (3). Nice ranks above Could. | `context/delivery-model.md` |
 | 2026-11-03 | Mary Rocheleau | Shipping | Capacity snapshot refreshes are shipped by Mary. Sift leaves them uncommitted and hands her the command. | `skills/capacity-refresh` |
 
 ## Declined changes
