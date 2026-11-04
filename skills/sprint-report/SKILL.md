@@ -67,11 +67,11 @@ pod only). The body is organized by the 2027 goals:
 ```
 *<Pod> Pod — Sprint <N> Summary, <Mon D> – <Mon D>, <year>*
 
-*Goal 4: LLO network and multi-org model*
+*LLO network and multi-org model*
 <Area of work> | <One sentence on what was delivered, in plain language.>
 <Area of work> | ...
 
-*Goal 3: Platform health, security and support*
+*Platform health, security and support*
 <Area of work> | ...
 
 *Not tied to a 2027 goal*
@@ -98,7 +98,7 @@ Rules:
 - The Mix line gives story / task / bug counts and points, from `mix_completed` and `mix_all`.
   Bugs are mostly unpointed, so don't quote a bug share of points.
 - Goals come from `context/2027-themes.md`. Use only the goals the sprint touched, in order of
-  how much work each took (not goal-number order), and use the goal names as written there.
+  how much work each took (not goal-number order), and use the goal names as written there, without goal numbers (the Jira numbering differs from the 1–5 list).
   Put work under a goal only where it plainly serves it; the rest goes under "Not tied to a 2027
   goal" (name it as upkeep) and is never forced into a fit. One area of work sits under one goal. Flag anything that conflicts with the
   Product Principles or `context/decisions.md`, the same as in any other skill.
