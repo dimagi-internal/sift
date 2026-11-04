@@ -22,7 +22,7 @@ Interrupt) board.
 | **Capacity refresh** | Re-reads the Connect Tech Sprint Performance dashboard for velocity and capacity, so sizing stays current. |
 
 Schedules (on canopy-web, America/New_York):
-- **Tuesday 08:00**: backlog sweep (CCC intake, then triage and interrupts, plus the monthly stale and principles reviews when due).
+- **Tuesday 08:00**: backlog sweep (roadmap intake, then triage and interrupts, plus the monthly stale and principles reviews when due).
 - **Wednesday 08:00**: grooming prep for Thursday's grooming.
 
 Sift can also be asked at any time, in plain language.

@@ -39,7 +39,7 @@ page (`skills/product-principles`). This file holds how *Sift* should triage, ra
 | 2026-11-03 | Mary Rocheleau | Shipping | Capacity snapshot refreshes are shipped by Mary. Sift leaves them uncommitted and hands her the command. | `skills/capacity-refresh` |
 | 2026-11-04 | Mary Rocheleau | Grooming prep | Prep team by team (Blue, Green, Mobile), each on its own. Focus on the CCCT tickets planned in the team's next sprint: check component, acceptance criteria, linked issues and description, and suggest the changes needed. Then review capacity. | `skills/grooming-prep`, `context/definition-of-ready.md` |
 | 2026-11-04 | Mary Rocheleau | CCC archived ideas | Exclude archived CCC ideas from sweeps, stale reviews and counts. Product Discovery archives ideas (e.g. on merge) without changing status; filter with `cf[10336] is EMPTY AND cf[10338] is EMPTY`. | `skills/backlog-triage`, `skills/review-stale-tickets` |
-| 2026-11-04 | Mary Rocheleau | CCC intake comments | Drafted problem-statement comments are the statement alone: no "Proposed problem statement" header, no "Supports goal …" tag, no named follow-ups. Reviewed one at a time before posting. | `skills/ccc-intake` |
+| 2026-11-04 | Mary Rocheleau | CCC intake comments | Drafted problem-statement comments are the statement alone: no "Proposed problem statement" header, no "Supports goal …" tag, no named follow-ups. Reviewed one at a time before posting. | `skills/roadmap-intake` |
 
 ## Declined changes
 Specific proposals that were struck. Before proposing a change to a ticket, check here for that
