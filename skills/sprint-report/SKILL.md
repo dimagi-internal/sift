@@ -2,7 +2,7 @@
 name: sprint-report
 description: >
   Write the summary report for a Connect sprint that has just closed in Jira: what was
-  completed, what carried over, the areas of work and the 2027 goals they serve, which epics
+  completed, what carried over, the work grouped by the 2027 goals it serves, which epics
   finished, and the story / task / bug split. One pod per report, kept short. Use when a sprint
   closes (on Sift's schedule it checks for newly closed sprints), or when asked for a "sprint
   report", "sprint summary", "what did we finish in Sprint 101" or "how did the sprint go".
@@ -16,7 +16,7 @@ doc) needs the human's approval like any other outbound action.
 
 Read first:
 - `context/delivery-model.md`: teams, sprint cadence, what each status means
-- `context/2027-themes.md`: the five goals, for naming the areas of work
+- `context/2027-themes.md`: the five goals, for grouping the work
 - `context/capacity-snapshot.md`: the sprint's commitment and velocity, if it covers this sprint
 
 ## 1. Find sprints that need a report
@@ -59,7 +59,7 @@ The output already does the counting. Use it as it is; don't recount from the is
 
 ## 3. Write the report
 A short summary a PM reads in a minute, in the style of the team's earlier Slack summaries
-(Sprint 98). The area sentences stay plain; ticket numbers appear only in the bullets and the Details line. Write for people who
+(Sprint 98). Ticket numbers appear only in the goal bullets, "Still to come" and the Details line. Write for people who
 don't read Jira: say what changed for workers, LLOs or staff, not what the ticket was called.
 
 Format (Slack: bold markers only. **No emojis or emoji shortcodes**, no headings or tables, one
@@ -68,17 +68,13 @@ pod only). The body is organized by the 2027 goals:
 *<Pod> Pod — Sprint <N> Summary, <Mon D> – <Mon D>, <year>*
 
 *LLO network and multi-org model*
-<Area of work> | <One sentence on what was delivered, in plain language.>
-<Area of work> | ...
 • <Ticket number> <short plain title>
 • <Ticket number> <short plain title> (finished after close)
 
 *Platform health, security and support*
-<Area of work> | ...
 • <Ticket number> <short plain title>
 
 *Not tied to a 2027 goal*
-<Area of work> | ...
 • <Ticket number> <short plain title>
 
 *Still to come:* <what carries over and why, one or two lines.>
@@ -92,13 +88,11 @@ shipped, and which items carry into the next sprint and why (in QA, blocked, not
 _Details: <KEY>, <KEY> carried over · <KEY> not counted (no Team)_
 ```
 Rules:
-- **Bullets under each goal** list every ticket delivered under it, one per line. Write the
+- **Under each goal there is only a bulleted list, no area-of-work lines or summary sentences.** It lists every ticket delivered under that goal, one per line. Write the
   ticket number without the `CCCT-` prefix and link it (`<https://dimagi.atlassian.net/browse/CCCT-2917|2917>`
   in Slack), then a short title in plain words. Mark tickets finished after the sprint closed.
   Carried-over tickets go in "Still to come", not under a goal.
-- **Concise.** The whole report should fit one screen. Group tickets into areas of work (epic
-  and component first; label your own grouping when tickets have no epic). Don't list tickets
-  one by one.
+- **Concise.** The whole report should fit one screen. Place each ticket under one goal (epic first). Titles are short and plain.
 - Issue counts in the paragraph are *closed of committed*, with Won't Do / Duplicate tickets
   left out of "committed". Say so only if it changes the picture.
 - A ticket finished after the sprint closed counts as carried over, and the paragraph says it
@@ -108,7 +102,7 @@ Rules:
 - Goals come from `context/2027-themes.md`. Use only the goals the sprint touched, in order of
   how much work each took (not goal-number order), and use the goal names as written there, without goal numbers (the Jira numbering differs from the 1–5 list).
   Put work under a goal only where it plainly serves it; the rest goes under "Not tied to a 2027
-  goal" (name it as upkeep) and is never forced into a fit. One area of work sits under one goal. Flag anything that conflicts with the
+  goal" (name it as upkeep) and is never forced into a fit. One ticket sits under one goal. Flag anything that conflicts with the
   Product Principles or `context/decisions.md`, the same as in any other skill.
 - An epic is "finished" only when `fully_finalized` is true and the epic wasn't already done
   before this sprint began.
