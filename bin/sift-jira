@@ -13,6 +13,8 @@ Usage:
   bin/sift-jira issue CCCT-412            -> one issue, full fields + links + comments + changelog
   bin/sift-jira transitions CCCT-412      -> statuses this issue can move to right now
   bin/sift-jira sprints [--state closed] [--since 2026-10-01]   -> sprints on the Blue/Green/Mobile boards
+  bin/sift-jira upcoming-sprints          -> future sprints holding open CCCT tickets, whole project, soonest first
+  bin/sift-jira sprint-tickets 6533       -> open CCCT tickets in one sprint, with team/points/components/parent
   bin/sift-jira sprint-data 6527          -> one sprint: completed vs not, type mix, epics (skills/sprint-report)
   bin/sift-jira apply plan.json --approved-by "<name>" [--dry-run]
 
@@ -36,6 +38,7 @@ import argparse
 import base64
 import json
 import os
+import re
 import sys
 import urllib.error
 import urllib.parse
@@ -179,6 +182,58 @@ def cmd_sprints(a):
                 break
             start += 50
     out.sort(key=lambda s: s["completed"] or s["end"] or "", reverse=True)
+    json.dump(out, sys.stdout, indent=1)
+    print()
+
+
+def _team(f):
+    return ((f.get("customfield_10001") or {}).get("name") or "").replace("Connect: ", "") or None
+
+
+def cmd_upcoming_sprints(a):
+    """Future sprints that hold open CCCT tickets, read from the tickets themselves.
+
+    Covers the whole project, not just the three team boards (a sprint on another board,
+    e.g. Mobile Team - Sprint 103, is missed by `sprints`). Soonest first.
+    """
+    by_id = {}
+    for it in _jql_all("project = CCCT AND sprint in futureSprints() AND statusCategory != Done", SPRINT_FIELDS):
+        f = it["fields"]
+        for s in f.get("customfield_10010") or []:
+            if s.get("state") != "future":
+                continue
+            row = by_id.setdefault(s["id"], {"id": s["id"], "name": s["name"], "board": s.get("boardId"),
+                                             "start": (s.get("startDate") or "")[:10] or None,
+                                             "end": (s.get("endDate") or "")[:10] or None,
+                                             "tickets": 0, "points": 0, "unestimated": 0, "teams": {}})
+            row["tickets"] += 1
+            pts = f.get("customfield_10017")
+            if pts:
+                row["points"] += pts
+            else:
+                row["unestimated"] += 1
+            t = _team(f) or "no team"
+            row["teams"][t] = row["teams"].get(t, 0) + 1
+    def num(r):  # sprints are numbered across all teams; Mobile's future sprints often have no dates yet
+        m = re.search(r"Sprint\s*(\d+)", r["name"])
+        return int(m.group(1)) if m else 9999
+    out = sorted(by_id.values(), key=lambda r: (num(r), r["name"]))
+    json.dump(out, sys.stdout, indent=1)
+    print()
+
+
+def cmd_sprint_tickets(a):
+    """Open CCCT tickets in one sprint, with the fields grooming checks (no description)."""
+    out = []
+    for it in _jql_all(f"project = CCCT AND sprint = {a.sprint_id} AND statusCategory != Done ORDER BY rank", SPRINT_FIELDS):
+        f = it["fields"]
+        out.append({"key": it["key"], "summary": f["summary"], "type": f["issuetype"]["name"],
+                    "status": f["status"]["name"], "team": _team(f),
+                    "components": [c["name"] for c in f.get("components") or []],
+                    "points": f.get("customfield_10017"), "parent": (f.get("parent") or {}).get("key"),
+                    "assignee": (f.get("assignee") or {}).get("displayName"),
+                    "other_open_sprints": [s["name"] for s in f.get("customfield_10010") or []
+                                           if s["id"] != a.sprint_id and s.get("state") != "closed"]})
     json.dump(out, sys.stdout, indent=1)
     print()
 
@@ -338,6 +393,11 @@ def main():
     sp.add_argument("--state", default="closed", help="closed | active | future (default closed)")
     sp.add_argument("--since", default="2000-01-01", help="only sprints closed/ending on or after YYYY-MM-DD")
     sp.set_defaults(fn=cmd_sprints)
+    us = sub.add_parser("upcoming-sprints")
+    us.set_defaults(fn=cmd_upcoming_sprints)
+    st = sub.add_parser("sprint-tickets")
+    st.add_argument("sprint_id", type=int)
+    st.set_defaults(fn=cmd_sprint_tickets)
     sd = sub.add_parser("sprint-data")
     sd.add_argument("sprint_id", type=int)
     sd.add_argument("--team", choices=sorted(TEAM_BOARDS.values()), help="pod whose tickets to report (Jira Team field)")
