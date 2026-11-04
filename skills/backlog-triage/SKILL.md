@@ -33,9 +33,14 @@ Run these and keep the JSON; each row is `{id, ts, key, summary, status, priorit
 parent, parent_type, components, team, links, …}`:
 ```bash
 T=$(mktemp -d)
-bin/sift-jira search --jql 'project in (CCC, CCCT) AND statusCategory != Done ORDER BY updated ASC' --max 500 > "$T/open.json"
-bin/sift-jira search --jql 'project = CCC AND statusCategory != Done' > "$T/roadmap.json"
+bin/sift-jira search --jql 'project in (CCC, CCCT) AND statusCategory != Done AND cf[10336] is EMPTY AND cf[10338] is EMPTY ORDER BY updated ASC' --max 500 > "$T/open.json"
+bin/sift-jira search --jql 'project = CCC AND statusCategory != Done AND cf[10336] is EMPTY AND cf[10338] is EMPTY' > "$T/roadmap.json"
 ```
+**Exclude archived CCC ideas** (Mary, 2026-11-04). Product Discovery archives an idea (for
+example when it's merged into another) without changing its status, so archived ideas still look
+open. `cf[10336]` is `Idea archived` and `cf[10338]` is `Idea archived on`. Both are empty on CCCT,
+so the filter only drops archived CCC ideas. Don't propose changes to archived ideas, and don't
+count them in findings.
 On the weekly cadence, narrow to what changed since last sweep:
 `canopy cursor since backlog-triage --local ~/.sift/state --items - < "$T/open.json"`. The cursor lives in
 `~/.sift/state` on this machine (Sift has no Google Drive yet). A full sweep (asked for

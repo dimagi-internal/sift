@@ -43,8 +43,10 @@ N days**. Keep `updated` as a second column so you can tell "stuck but discussed
 ```bash
 T=$(mktemp -d); P=CCCT; N=90
 bin/sift-jira search --max 500 --jql "project = $P AND statusCategory != Done \
+  AND cf[10336] is EMPTY AND cf[10338] is EMPTY \
   AND NOT status CHANGED AFTER -${N}d AND created <= -${N}d ORDER BY updated ASC" > "$T/stuck.json"
 ```
+The `cf[10336]`/`cf[10338]` clauses drop archived CCC ideas (Mary, 2026-11-04); they are no-ops on CCCT.
 Repeat runs: `canopy cursor since review-stale-$P --local ~/.sift/state --items - < "$T/stuck.json"`.
 
 Read every candidate in full before judging it — `bin/sift-jira issue <KEY>` (description,

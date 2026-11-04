@@ -37,6 +37,7 @@ page (`skills/product-principles`). This file holds how *Sift* should triage, ra
 | 2026-11-03 | Mary Rocheleau | Definition of ready | CCC needs owner, Goal + Prioritization, a linked spec doc and a problem statement before Technical Specification. CCCT Stories need AC to enter a sprint; Tasks need a clear done; Bugs need repro. | `context/definition-of-ready.md` |
 | 2026-11-03 | Mary Rocheleau | Cadence | Grooming is Thursday. Sift runs a backlog sweep Tuesday and grooming prep Wednesday (08:00 ET), on Mary's machine when it's on. | canopy-web schedules 31, 32 |
 | 2026-11-03 | Mary Rocheleau | Shipping | Capacity snapshot refreshes are shipped by Mary. Sift leaves them uncommitted and hands her the command. | `skills/capacity-refresh` |
+| 2026-11-04 | Mary Rocheleau | CCC archived ideas | Exclude archived CCC ideas from sweeps, stale reviews and counts. Product Discovery archives ideas (e.g. on merge) without changing status; filter with `cf[10336] is EMPTY AND cf[10338] is EMPTY`. | `skills/backlog-triage`, `skills/review-stale-tickets` |
 
 ## Declined changes
 Specific proposals that were struck. Before proposing a change to a ticket, check here for that
