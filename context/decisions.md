@@ -48,3 +48,4 @@ key and op. Re-propose only if the ticket has materially changed since, and say 
 | 2026-10-27 | Mary Rocheleau | [CCCT-2347](https://dimagi.atlassian.net/browse/CCCT-2347) | Re-parent under epic [CCCT-2067](https://dimagi.atlassian.net/browse/CCCT-2067) | — |
 | 2026-11-04 | Mary Rocheleau | [CCCT-2945](https://dimagi.atlassian.net/browse/CCCT-2945) | Comment asking Manish whether the contact migration is still blocked | Manish is on PTO |
 | 2026-11-04 | Mary Rocheleau | [CCC-292](https://dimagi.atlassian.net/browse/CCC-292) | Set Goal 01 (FLW identity) | Moved to Prioritization = Backlog instead of Could Have |
+| 2026-11-04 | Mary Rocheleau | [CCC-292](https://dimagi.atlassian.net/browse/CCC-292) | Move status back to Backlog to match Prioritization = Backlog (do not flag the mismatch) | Leave as is |
