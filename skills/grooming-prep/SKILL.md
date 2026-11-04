@@ -1,12 +1,13 @@
 ---
 name: grooming-prep
 description: >
-  Prepare Connect's Thursday grooming session, one team at a time (Blue, Green, Mobile): check
-  every CCCT ticket planned in the team's next sprint for the right component, acceptance
-  criteria, linked issues and an adequate description, draft the changes each one needs, then
-  review the team's capacity against what's planned. Produces one agenda per team plus an
-  approval-gated plan. Use on Sift's Wednesday schedule, or when asked to "prep grooming",
-  "what's ready for grooming", "prep Blue for grooming" or "get tickets ready for Thursday".
+  Prepare Connect's Thursday grooming session for ONE sprint at a time. Starts by listing the
+  upcoming sprints across the whole CCCT project and asking which one to prepare. Then checks
+  every open ticket in that sprint for the right component, acceptance criteria, linked issues
+  and an adequate description, drafts the changes each one needs, and reviews the sprint's
+  capacity against what's planned. Produces one agenda plus an approval-gated plan. Use on
+  Sift's Wednesday schedule, or when asked to "prep grooming", "what's ready for grooming",
+  "prep Blue for grooming", "prep Sprint 103" or "get tickets ready for Thursday".
 ---
 
 # Grooming prep — Sift
@@ -16,18 +17,17 @@ Reads are free. Jira writes (comments with drafted AC, field fixes, links) go on
 - `context/definition-of-ready.md`: the standard you're checking against
 - `context/delivery-model.md`: teams and rosters, Prioritization order (Must > Nice > Could),
   capacity method
-- `context/capacity-snapshot.md`: next sprint's capacity and estimated velocity, and who's out
+- `context/capacity-snapshot.md`: the sprint's capacity and estimated velocity, and who's out
 - `context/decisions.md`: rulings and declined changes. Never re-propose a declined change.
 
 Don't use the `connect-tech:groom-sprint-tickets` command. It runs only when a human invokes
 it explicitly.
 
-## Shape: team by team
-Prepare **Blue, Green and Mobile separately**, in that order (Mary, 2026-11-04). Each team gets
-its own pass through steps 1–4 and its own section of the report, so each one can be read
-or groomed alone. If the asker names one team, do only that team. Never mix one team's tickets
-into another's findings or capacity numbers. A ticket that looks like it belongs to another team
-is a finding on the team it's filed under (see Component, below).
+## Shape: one sprint per run
+Each run prepares **one Jira sprint**, which is one team's sprint (Mary, 2026-11-04). Never mix
+two sprints' tickets into one set of findings or capacity numbers. To prep another sprint,
+run the skill again. A ticket in the sprint that looks like it belongs to another team is a
+finding on this sprint (see Component, below).
 
 | Team | Jira `Team` (`customfield_10001`) | Expected component | Sprint name looks like |
 |---|---|---|---|
@@ -35,16 +35,41 @@ is a finding on the team it's filed under (see Component, below).
 | Green | `Connect: Green Web Team` | `Web / Server` | `Green Pod - Sprint 103` |
 | Mobile | `Connect: Mobile Team` | `Mobile` | `Mobile Team - Sprint 103` |
 
-## 1. Find the team's planned tickets
-The planned tickets are the team's open CCCT tickets in its **next** sprint: the earliest
-`future` sprint for that team (`customfield_10010`). Match on team and sprint number, not the
-exact name.
+## 0. Ask which sprint
+Always start here, before reading any tickets. List the upcoming sprints across the **whole
+CCCT project**:
 ```bash
-bin/sift-jira search --jql 'project = CCCT AND sprint in futureSprints() AND statusCategory != Done AND "Team[Team]" = "Connect: Blue Web Team" ORDER BY rank' --max 200
+bin/sift-jira upcoming-sprints
 ```
-`search` doesn't return sprints, points or descriptions. Fetch each ticket with
-`bin/sift-jira issue <KEY>` (run them in parallel) and keep only the earliest future sprint.
+It reads future sprints from the tickets themselves, so it also finds sprints that aren't on
+the three team boards (`bin/sift-jira sprints` misses some, e.g. Mobile's). The list is ordered
+by sprint number; Mobile's future sprints often have no dates yet.
+
+Ask which sprint to prepare (AskUserQuestion when the asker is present). Offer the soonest
+sprints as options, each labeled with its name, start date (or "no dates yet"), ticket count
+and points (e.g. "Green Pod - Sprint 103 — 16 Nov, 17 tickets, 45 pts + 6 unestimated").
+Recommend the soonest sprint for the team the asker named, or the soonest sprint overall.
+Teams share sprint numbers, so several sprints can be "next" at once; list them all.
+- If the asker already named a sprint ("prep Green 103"), confirm it from the list and skip
+  the question.
+- If they named only a team ("prep Blue"), offer that team's upcoming sprints.
+- On an unattended run (no one to ask), don't guess: post the list as the turn's output and
+  stop.
+- A sprint with tickets from several teams, or tickets with no Team, is a finding for step 2,
+  not a reason to skip it.
+
+## 1. Get the sprint's tickets
+```bash
+bin/sift-jira sprint-tickets <sprint_id>
+```
+This returns every open CCCT ticket in the sprint with its team, type, status, points,
+components, parent and any other open sprint it's in. Then fetch each ticket in full with
+`bin/sift-jira issue <KEY>` (run them in parallel) for the description, links and comments.
 Also fetch each parent epic once, for its component, team and CCC link.
+
+**Carry-over:** tickets already past `Backlog` / `To Do` (In Progress, In Review, In QA, Ready
+for Deploy, Blocked) were started in an earlier sprint. Count them in capacity, list them
+separately in the report, and don't run the readiness checks on them.
 
 ## 2. Check each planned ticket
 Run every planned ticket through these four checks. A gap is a finding with a drafted fix, not
@@ -57,7 +82,7 @@ a block. Never move a ticket's status because it's not ready.
 - **Missing:** propose the team's component (`update`).
 - **Contradicting:** e.g. a `[web]` ticket on the Mobile team, or `Mobile` on a Blue ticket.
   Either the component or the team is wrong. Flag it as a question for the room and don't pick
-  one (`skills/clean-the-backlog` rule). If it moves teams it leaves this team's capacity, so say so.
+  one (`skills/clean-the-backlog` rule). If it moves teams it leaves this sprint's capacity, so say so.
 
 ### Acceptance criteria (by type, per the definition of ready)
 - **Story:** an Acceptance Criteria section with testable statements. If it's missing or vague
@@ -97,10 +122,10 @@ Also note, but keep short:
 - **Product Principles:** if a ticket conflicts with one, flag it and quote the principle
   (`skills/product-principles`).
 
-## 3. Review the team's capacity
+## 3. Review the sprint's capacity
 Do this after the ticket checks, using `context/capacity-snapshot.md`. Refresh the snapshot
 first (`skills/capacity-refresh`) if it's stale.
-- **Capacity line:** the next sprint's capacity days and estimated velocity (rolling velocity per
+- **Capacity line:** the sprint's team capacity days and estimated velocity (rolling velocity per
   team-day × capacity days), with who's out or allocated elsewhere.
 - **Planned load:** the sum of points on the planned tickets, plus the count of unestimated
   tickets. Leave out tickets your findings would move to another team, and say so.
@@ -109,15 +134,15 @@ first (`skills/capacity-refresh`) if it's stale.
     ranked by Prioritization (Could first, then Nice, then Must), then by how little the
     ticket moves a 2027 goal.
   - **Under (below about 0.8×):** suggest backlog candidates to pull in, up to about velocity.
-    Take open Backlog-status tickets for this team, under epics whose CCC idea is planned,
-    ranked Must > Nice > Could, then by goal, then Implementation before Technical
+    Take open Backlog-status tickets for this sprint's team that aren't in another sprint,
+    under epics whose CCC idea is planned, ranked Must > Nice > Could, then by goal, then Implementation before Technical
     Specification. Run each through step 2 too. Skip ideas with Prioritization `Backlog`.
   - **About right:** say so in one line.
 - The snapshot gives Web capacity for Blue and Green together. When there's no per-team split,
   estimate each team's share from its headcount after PTO and say it's an estimate.
 
-## 4. Report: one section per team
-In the order Blue, Green, Mobile, give each team:
+## 4. Report: one sprint
+Lead with the sprint's name, dates and team, then give:
 1. **Ready:** the planned tickets that pass every check, one line each with points.
 2. **Needs changes:** one line per ticket, grouped by check (Component / AC / Links /
    Description). Each line has the specific change: drafted AC inline, the field value, or the
