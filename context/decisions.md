@@ -39,6 +39,7 @@ page (`skills/product-principles`). This file holds how *Sift* should triage, ra
 | 2026-11-03 | Mary Rocheleau | Shipping | Capacity snapshot refreshes are shipped by Mary. Sift leaves them uncommitted and hands her the command. | `skills/capacity-refresh` |
 | 2026-11-04 | Mary Rocheleau | Grooming prep | Prep team by team (Blue, Green, Mobile), each on its own. Focus on the CCCT tickets planned in the team's next sprint: check component, acceptance criteria, linked issues and description, and suggest the changes needed. Then review capacity. | `skills/grooming-prep`, `context/definition-of-ready.md` |
 | 2026-11-04 | Mary Rocheleau | CCC archived ideas | Exclude archived CCC ideas from sweeps, stale reviews and counts. Product Discovery archives ideas (e.g. on merge) without changing status; filter with `cf[10336] is EMPTY AND cf[10338] is EMPTY`. | `skills/backlog-triage`, `skills/review-stale-tickets` |
+| 2026-11-04 | Mary Rocheleau | CCC intake comments | Drafted problem-statement comments are the statement alone: no "Proposed problem statement" header, no "Supports goal …" tag, no named follow-ups. Reviewed one at a time before posting. | `skills/ccc-intake` |
 
 ## Declined changes
 Specific proposals that were struck. Before proposing a change to a ticket, check here for that
@@ -50,3 +51,5 @@ key and op. Re-propose only if the ticket has materially changed since, and say 
 | 2026-11-04 | Mary Rocheleau | [CCCT-2945](https://dimagi.atlassian.net/browse/CCCT-2945) | Comment asking Manish whether the contact migration is still blocked | Manish is on PTO |
 | 2026-11-04 | Mary Rocheleau | [CCC-292](https://dimagi.atlassian.net/browse/CCC-292) | Set Goal 01 (FLW identity) | Moved to Prioritization = Backlog instead of Could Have |
 | 2026-11-04 | Mary Rocheleau | [CCC-292](https://dimagi.atlassian.net/browse/CCC-292) | Move status back to Backlog to match Prioritization = Backlog (do not flag the mismatch) | Leave as is |
+| 2026-11-04 | Mary Rocheleau | [CCC-464](https://dimagi.atlassian.net/browse/CCC-464) | Intake comment with a drafted problem statement (Celery schedules drift) | — |
+| 2026-11-04 | Mary Rocheleau | [CCC-470](https://dimagi.atlassian.net/browse/CCC-470) | Intake comment with a drafted problem statement (Sunset Superset) | — |

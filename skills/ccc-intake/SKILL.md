@@ -48,7 +48,7 @@ list handy (`project = CCC AND statusCategory != Done AND cf[10336] is EMPTY AND
 |---|---|---|---|
 | 1 | **Priority** | `Prioritization` (`customfield_12800`) is set: `Must Have`, `Nice to Have`, `Could Have` or `Backlog` | `update` with one value + a one-line reason. Default to `Backlog` unless the idea clearly moves a goal's metric now or comes from a live interrupt |
 | 2 | **Goal** | `Goal` (`customfield_14111`) has 1+ of the five goals, or the idea is deliberately off-goal | `update` with the goal(s) it directly serves, citing the "What each goal covers" bullet it matches; if none fits, propose **no Goal** and say so in the report (not a defect) |
-| 3 | **Good description** | A PM could pick it up cold: **who** is affected, **what goes wrong today** (the problem, not only the solution), and **why it matters** / what better looks like. Links to the source (CI ticket, Slack, doc) are a plus | `comment` with a drafted 2–4 line problem statement for the reporter to confirm and paste in. Never overwrite the description |
+| 3 | **Good description** | A PM could pick it up cold: **who** is affected, **what goes wrong today** (the problem, not only the solution), and **why it matters** / what better looks like. Links to the source (CI ticket, Slack, doc) are a plus | `comment` with a drafted 2–4 line problem statement for the reporter to confirm and paste in: the statement alone, no header, no goal tag, no names (ruling 2026-11-04). Never overwrite the description. Skip an idea that already has an intake comment |
 | 4 | **Product Area** | `Product Area` (`customfield_10448`) has **1 or 2** values | 0 → `update` with the 1–2 best fits; 3+ → `update` down to the 2 that fit best (say which were dropped). Values must match Jira's list exactly — see below |
 
 Also fill **Platform** (`customfield_10434`, `Web` / `Mobile`) when it's empty and obvious from
@@ -106,6 +106,7 @@ how many you skipped and why.
 - Dry-run: `bin/sift-jira apply plan.json --approved-by dry-run --dry-run`.
 
 ## 5. Approval, then apply
+Field updates can be approved as a batch. Comments are reviewed **one at a time**: show each drafted comment in full and post only the ones approved, with the approver's edits verbatim (ruling 2026-11-04).
 Present the report + plan for approval (turn Step 2). Goal and Prioritization are never written
 without this approval (ruling 2026-10-27); the approver may strike or change values line by
 line. Log struck lines in `context/decisions.md` (Declined changes) and any rule they state
@@ -114,7 +115,7 @@ under Standing rulings. Then:
 bin/sift-jira apply plan.json --approved-by "<approver's name>"
 canopy cursor bump ccc-intake --local ~/.sift/state --items - < "$T/todo.json"
 ```
-Bump with every idea you reviewed, including ones that passed. Report what applied and anything
+Bump with every idea you reviewed, including ones that passed. Re-pull the rows after applying and bump those, so your own comments don't make an idea look edited next run. Report what applied and anything
 that errored, one line each.
 
 ## Never
