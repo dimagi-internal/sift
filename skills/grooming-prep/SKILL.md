@@ -1,13 +1,14 @@
 ---
 name: grooming-prep
 description: >
-  Prepare Connect's Thursday grooming session for ONE sprint at a time. Starts by listing the
-  upcoming sprints across the whole CCCT project and asking which one to prepare. Then checks
-  every open ticket in that sprint for the right component, acceptance criteria, linked issues
-  and an adequate description, drafts the changes each one needs, and reviews the sprint's
-  capacity against what's planned. Produces one agenda plus an approval-gated plan. Use on
-  Sift's Wednesday schedule, or when asked to "prep grooming", "what's ready for grooming",
-  "prep Blue for grooming", "prep Sprint 103" or "get tickets ready for Thursday".
+  Prepare Connect's Thursday grooming session for ONE sprint at a time, focused on ticket
+  quality. Starts by listing the upcoming sprints across the whole CCCT project and asking which
+  one to prepare. Then checks every planned ticket in that sprint for a clear description,
+  acceptance criteria (or the type's equivalent) and links to related tickets, especially
+  anything that could block it, and drafts the changes each one needs. Produces one agenda plus
+  an approval-gated plan. Capacity is out of scope for now. Use on Sift's Wednesday schedule, or
+  when asked to "prep grooming", "what's ready for grooming", "prep Blue for grooming",
+  "prep Sprint 103" or "get tickets ready for Thursday".
 ---
 
 # Grooming prep — Sift
@@ -15,17 +16,21 @@ description: >
 Reads are free. Jira writes (comments with drafted AC, field fixes, links) go only through
 `bin/sift-jira apply` after approval. Read first:
 - `context/definition-of-ready.md`: the standard you're checking against
-- `context/delivery-model.md`: teams and rosters, Prioritization order (Must > Nice > Could),
-  capacity method
-- `context/capacity-snapshot.md`: the sprint's capacity and estimated velocity, and who's out
+- `context/delivery-model.md`: teams, rosters and the CCCT flow
 - `context/decisions.md`: rulings and declined changes. Never re-propose a declined change.
 
 Don't use the `connect-tech:groom-sprint-tickets` command. It runs only when a human invokes
 it explicitly.
 
+## Scope: ticket quality only
+This skill checks whether the sprint's tickets are **ready to be worked**: a clear description,
+acceptance criteria and links to related or blocking tickets (Mary, 2026-11-04). It does not
+review capacity, points or what to drop or pull in. That may come back later; until then,
+don't add it to the report.
+
 ## Shape: one sprint per run
 Each run prepares **one Jira sprint**, which is one team's sprint (Mary, 2026-11-04). Never mix
-two sprints' tickets into one set of findings or capacity numbers. To prep another sprint,
+two sprints' tickets into one set of findings. To prep another sprint,
 run the skill again. A ticket in the sprint that looks like it belongs to another team is a
 finding on this sprint (see Component, below).
 
@@ -68,96 +73,89 @@ components, parent and any other open sprint it's in. Then fetch each ticket in 
 Also fetch each parent epic once, for its component, team and CCC link.
 
 **Carry-over:** tickets already past `Backlog` / `To Do` (In Progress, In Review, In QA, Ready
-for Deploy, Blocked) were started in an earlier sprint. Count them in capacity, list them
-separately in the report, and don't run the readiness checks on them.
+for Deploy) were started in an earlier sprint. List them separately in the report and don't
+run the readiness checks on them. A ticket in `Blocked` is the exception: run the Links check
+on it, since its blocker is exactly what grooming needs to see.
 
 ## 2. Check each planned ticket
-Run every planned ticket through these four checks. A gap is a finding with a drafted fix, not
-a block. Never move a ticket's status because it's not ready.
-
-### Component
-- `components` matches the team: `Web / Server` for Blue and Green, `Mobile` for Mobile. Both is
-  fine when the ticket really spans both.
-- It agrees with the summary's prefix (`[web]`, `[mobile]`) and with the parent epic.
-- **Missing:** propose the team's component (`update`).
-- **Contradicting:** e.g. a `[web]` ticket on the Mobile team, or `Mobile` on a Blue ticket.
-  Either the component or the team is wrong. Flag it as a question for the room and don't pick
-  one (`skills/clean-the-backlog` rule). If it moves teams it leaves this sprint's capacity, so say so.
-
-### Acceptance criteria (by type, per the definition of ready)
-- **Story:** an Acceptance Criteria section with testable statements. If it's missing or vague
-  ("works as expected"), draft 3–6 testable criteria from the description, the epic, the CCC
-  idea and any linked spec. Use plain language and mark guesses with "(confirm)".
-- **Task:** a clear statement of what "done" means. If there isn't one, draft one or two lines.
-- **Bug:** repro steps, expected vs. actual, and where it was seen (app or platform version,
-  opportunity). List the specific questions for the reporter.
-- **Design / Test:** say what the output is (a spec doc, a test plan). Flag it if that's unclear.
-
-### Linked issues
-- **Parent epic:** set for every type except Bug and Test. If it's missing, propose the obvious
-  epic (`update` parent), or flag it if there isn't one.
-- **Epic → roadmap:** the epic links its CCC idea (`Polaris work item link`), and that idea is
-  planned (Prioritization set and not `Backlog`). Report a missing or parked idea **once per
-  epic**, not once per ticket.
-- **Dependencies:** a ticket named in the description ("Mobile counterpart: CCCT-2994",
-  "after CCCT-2838") has a matching link. Web/mobile pairs link each other. Propose the
-  `link` (Blocks / Relates).
-- **Blocked:** a ticket in `Blocked` names its blocker with a link or a comment. Check the link
-  direction too: "X blocks Y" should mean Y waits on X.
-- **Duplicates:** if it's linked as a duplicate, check which one is still live.
+Run every planned ticket through these three checks, in this order. A gap is a finding with a
+drafted fix, not a block. Never move a ticket's status because it's not ready.
 
 ### Description
 The test: could a teammate who wasn't in the room pick it up cold? It needs:
-- **What and why:** the change and the user or system problem it solves, not just a title
+- **What and why:** the change and the user or system problem it solves, not just the title
   restated.
-- **Scope:** what's in and what's out, where that's ambiguous.
+- **Scope:** what's in and what's out, where that's ambiguous. Watch for sentences that
+  contradict each other, and for open questions left in the description ("Open product
+  question: …"). An open question is a question for the room, not a pass.
 - **References:** a link to the spec or design when the epic or CCC idea has one, and the
   screens, endpoints or models involved.
+- **Decisions made in comments:** if a comment settles something (wording, scope, an
+  approach), the description should say it too. Draft the line to add.
 If it's thin, draft the missing lines from the epic, the CCC idea and the linked tickets, for
 the team to confirm. Don't rewrite a description that already passes.
 
+### Acceptance criteria (by type, per the definition of ready)
+- **Story:** an Acceptance Criteria section with testable statements. If it's missing or vague
+  ("works as expected", "emails to be sent"), draft 3–6 testable criteria from the
+  description, the epic, the CCC idea and any linked spec. Use plain language and mark guesses
+  with "(confirm)".
+- **Task:** a clear statement of what "done" means ("Done when" counts). If there isn't one,
+  draft one or two lines.
+- **Bug:** repro steps, expected vs. actual, and where it was seen (app or platform version,
+  opportunity). A description of the fix is not a repro. List the specific questions for the
+  reporter.
+- **Design / Test:** say what the output is (a spec doc, a test plan) and where it lives. Flag
+  it if that's unclear.
+
+### Links to related tickets and blockers
+The question for each ticket: **is anything it depends on missing, unlinked or not going to be
+ready in time?**
+1. **Find what it depends on.** Look for:
+   - tickets named in the description or comments ("Depends on CCCT-2996", "Mobile
+     counterpart: CCCT-2994", "after CCCT-2838");
+   - its web/mobile counterpart (same feature, `[web]` / `[mobile]` prefix, often in the same
+     epic);
+   - siblings in the same epic whose work it builds on (a model, an endpoint, a screen it
+     extends).
+2. **Check each one is linked**, with the right type and direction: "X blocks Y" means Y waits
+   on X; use Relates for a pair that doesn't wait on each other. Propose any missing `link`.
+3. **Check each blocker will be ready.** For every ticket this one is blocked by:
+   - Done → fine.
+   - In this sprint → fine, but say the order if both are in the sprint.
+   - In the current sprint and not started, in a later sprint, or in no sprint → **finding**:
+     this ticket can't start until it moves. Say which.
+4. **Status `Blocked`:** it names its blocker with a link or a comment.
+5. **Stale links:** a link to a Won't Do or duplicate ticket ("implements CCCT-2728 [Won't
+   Do]") is a finding. Say what it should point to instead, if anything.
+6. **Parent epic:** set for every type except Bug and Test. If it's missing, propose the obvious
+   epic (`update` parent), or flag it if there isn't one. Once per epic, check the epic links a
+   CCC idea (`Polaris work item link`).
+
 Also note, but keep short:
-- **Points:** missing points are agenda items for grooming, not defects. An 8, or a ticket
-  clearly bigger than a sprint, gets a proposed split (titles only).
+- **Component:** `Web / Server` for Blue and Green, `Mobile` for Mobile. Propose it when
+  missing; when it contradicts the team or the `[web]` / `[mobile]` prefix, flag it as a
+  question for the room and don't pick one.
 - **Product Principles:** if a ticket conflicts with one, flag it and quote the principle
   (`skills/product-principles`).
 
-## 3. Review the sprint's capacity
-Do this after the ticket checks, using `context/capacity-snapshot.md`. Refresh the snapshot
-first (`skills/capacity-refresh`) if it's stale.
-- **Capacity line:** the sprint's team capacity days and estimated velocity (rolling velocity per
-  team-day × capacity days), with who's out or allocated elsewhere.
-- **Planned load:** the sum of points on the planned tickets, plus the count of unestimated
-  tickets. Leave out tickets your findings would move to another team, and say so.
-- **Verdict:**
-  - **Over (above about 1.2× velocity):** name what's likely to slip and propose what to drop,
-    ranked by Prioritization (Could first, then Nice, then Must), then by how little the
-    ticket moves a 2027 goal.
-  - **Under (below about 0.8×):** suggest backlog candidates to pull in, up to about velocity.
-    Take open Backlog-status tickets for this sprint's team that aren't in another sprint,
-    under epics whose CCC idea is planned, ranked Must > Nice > Could, then by goal, then Implementation before Technical
-    Specification. Run each through step 2 too. Skip ideas with Prioritization `Backlog`.
-  - **About right:** say so in one line.
-- The snapshot gives Web capacity for Blue and Green together. When there's no per-team split,
-  estimate each team's share from its headcount after PTO and say it's an estimate.
-
-## 4. Report: one sprint
+## 3. Report: one sprint
 Lead with the sprint's name, dates and team, then give:
-1. **Ready:** the planned tickets that pass every check, one line each with points.
-2. **Needs changes:** one line per ticket, grouped by check (Component / AC / Links /
-   Description). Each line has the specific change: drafted AC inline, the field value, or the
-   link to add.
-3. **Capacity:** the capacity line, planned load and verdict, with what to drop or pull in.
-4. **Questions for the room:** decisions only humans can make, like team moves, splits, scope
-   and conflicting signals.
+1. **Ready:** the planned tickets that pass every check, one line each.
+2. **Needs changes:** one line per ticket, grouped by check (Description / AC / Links). Each
+   line has the specific change: drafted AC inline, the line to add, or the link to add.
+3. **Blockers at risk:** tickets whose blocker isn't done and isn't scheduled ahead of them.
+4. **Carry-over:** tickets already started, one line each, unchecked.
+5. **Questions for the room:** decisions only humans can make, like open product questions,
+   scope, splits, team moves and conflicting signals.
 
 Link every key. Then give the plan: `comment` ops for drafted AC, done statements, description
-additions and repro questions; `update` ops for components and epics (components replace the
-whole list, so include the existing ones); `link` ops for missing dependencies. Field mechanics
+additions and repro questions; `link` ops for missing dependencies; `update` ops for epics and
+components (components replace the whole list, so include the existing ones). Field mechanics
 are in `skills/clean-the-backlog` (CCCT hygiene). Dry-run the plan before presenting it:
 `bin/sift-jira apply plan.json --approved-by "<name>" --dry-run`.
 
-## 5. Approval, then apply
+## 4. Approval, then apply
 Present the agenda and plan for approval. Record struck lines in `context/decisions.md`
 (Declined changes), and add any rule someone states to Standing rulings. Then run
 `bin/sift-jira apply plan.json --approved-by "<name>"` and report what applied.
