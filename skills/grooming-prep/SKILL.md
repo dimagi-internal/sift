@@ -57,7 +57,7 @@ a block. Never move a ticket's status because it's not ready.
 - **Missing:** propose the team's component (`update`).
 - **Contradicting:** e.g. a `[web]` ticket on the Mobile team, or `Mobile` on a Blue ticket.
   Either the component or the team is wrong. Flag it as a question for the room and don't pick
-  one (`skills/backlog-triage` rule). If it moves teams it leaves this team's capacity, so say so.
+  one (`skills/clean-the-backlog` rule). If it moves teams it leaves this team's capacity, so say so.
 
 ### Acceptance criteria (by type, per the definition of ready)
 - **Story:** an Acceptance Criteria section with testable statements. If it's missing or vague
@@ -129,7 +129,7 @@ In the order Blue, Green, Mobile, give each team:
 Link every key. Then give the plan: `comment` ops for drafted AC, done statements, description
 additions and repro questions; `update` ops for components and epics (components replace the
 whole list, so include the existing ones); `link` ops for missing dependencies. Field mechanics
-are in `skills/backlog-triage` (CCCT hygiene). Dry-run the plan before presenting it:
+are in `skills/clean-the-backlog` (CCCT hygiene). Dry-run the plan before presenting it:
 `bin/sift-jira apply plan.json --approved-by "<name>" --dry-run`.
 
 ## 5. Approval, then apply

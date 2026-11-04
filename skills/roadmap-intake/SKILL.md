@@ -6,7 +6,7 @@ description: >
   1–2 Product Areas), propose the missing values and a drafted problem statement, get the
   batch approved, then apply it with bin/sift-jira. Use when asked to "triage new CCC items",
   "roadmap intake", "review new ideas", "what came into the roadmap this week", "intake", or on the Tuesday sweep
-  before backlog-triage.
+  before clean-the-backlog.
 argument-hint: "[--days 14] [--full] [--max 40]"
 ---
 
@@ -14,7 +14,7 @@ argument-hint: "[--days 14] [--full] [--max 40]"
 
 Reads are free; Jira writes happen only via `bin/sift-jira apply` on a plan a human approved.
 This skill covers **new** CCC ideas only. The CCCT delivery backlog sweep is
-`sift:backlog-triage`, which does not check CCC fields; stale CCC items go through
+`sift:clean-the-backlog`, which does not check CCC fields; stale CCC items go through
 `sift:review-stale-tickets CCC`.
 
 ## 1. Scope
@@ -123,5 +123,5 @@ that errored, one line each.
 - Write to Jira any other way — railed in `config/gating.json`.
 - Overwrite an idea's description or summary, change its status, or assign it — propose, flag.
 - Re-propose a declined Goal (e.g. PersonalID recovery items for goal 01).
-- Touch CCCT or CI — delivery tickets go through `sift:backlog-triage` / `sift:review-interrupt`.
+- Touch CCCT or CI — delivery tickets go through `sift:clean-the-backlog` / `sift:grooming-prep` / `sift:review-interrupt`.
 - Post the report to Slack directly — reply in the turn; canopy-web relays it.

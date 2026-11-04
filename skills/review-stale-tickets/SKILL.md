@@ -5,7 +5,7 @@ description: >
   (CCCT = implementation/delivery, CCC = roadmap), decide per ticket whether to close, nudge
   or leave it, and get the batch approved before bin/sift-jira applies it. Use when asked to
   "review stale tickets", "clean up stale CCCT", "what's stuck on the roadmap", or when
-  backlog-triage hits its Stale signal. Monthly cadence. The CI interrupt board has its own
+  clean-the-backlog hits its Stale signal. Monthly cadence. The CI interrupt board has its own
   weekly skill, sift:review-interrupt.
 argument-hint: "<CCCT|CCC> [--days 90] [--max 40] [--full]"
 ---

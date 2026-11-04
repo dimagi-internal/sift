@@ -28,7 +28,7 @@ improvements ship once (a canopy PR) instead of N backports.
 
 ## Sift-local notes (the ONLY hand-edited section — fleet-process changes go to canopy)
 - New CCC ideas ("triage new CCC items", "roadmap intake", "intake") → `skills/roadmap-intake`.
-- CCCT backlog requests ("triage the backlog", "groom CCCT", "clean up CCCT") → `skills/backlog-triage`; grooming prep
+- CCCT backlog requests ("clean the backlog", "triage the backlog", "clean up CCCT") → `skills/clean-the-backlog`; grooming prep
   ("prep grooming", "what's ready for Thursday") → `skills/grooming-prep`.
 - Sprint closed / "sprint report", "what did we finish in Sprint N" → `skills/sprint-report`.
   Each turn, check for newly closed sprints (cursor-guarded) and draft a report for any.
