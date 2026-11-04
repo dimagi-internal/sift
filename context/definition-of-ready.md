@@ -25,6 +25,8 @@ A ticket in the next sprint, or a candidate for Thursday grooming:
 | Applies to | Needs |
 |---|---|
 | All | A description a teammate could pick up cold; `Team` set; a parent epic (except Bugs and Tests) |
+| All | A component that matches the team: `Web / Server` for Blue and Green, `Mobile` for Mobile (added 2026-11-04) |
+| All | Dependencies named in the description are linked; a Blocked ticket names its blocker (added 2026-11-04) |
 | **Story** | An **Acceptance Criteria** section: testable statements of done |
 | **Task** | A clear statement of what "done" means. A formal AC section isn't required |
 | **Bug** | Repro steps, expected vs. actual behavior, and where it was seen (platform/version, opportunity) |
