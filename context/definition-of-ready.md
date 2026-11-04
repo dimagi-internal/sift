@@ -41,7 +41,7 @@ A ticket in the next sprint, or a candidate for Thursday grooming:
 
 ## How Sift uses it
 - **Grooming prep (Wednesday):** check every grooming candidate against the CCCT list. For
-  each gap, draft the fix (proposed AC for a Story, repro questions for a Bug, a split for an 8)
+  each gap, draft the fix (proposed AC for a Story, repro questions for a Bug, a missing blocker link)
   so grooming spends its time deciding, not writing.
 - **Triage:** the "Under-specified" signal means failing this definition. For CCC, check the
   four items above on anything in Technical Specification or later.
