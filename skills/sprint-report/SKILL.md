@@ -59,7 +59,7 @@ The output already does the counting. Use it as it is; don't recount from the is
 
 ## 3. Write the report
 A short summary a PM reads in a minute, in the style of the team's earlier Slack summaries
-(Sprint 98). Ticket keys go in the "Details" line only, not in the body. Write for people who
+(Sprint 98). The area sentences stay plain; ticket numbers appear only in the bullets and the Details line. Write for people who
 don't read Jira: say what changed for workers, LLOs or staff, not what the ticket was called.
 
 Format (Slack: bold markers only. **No emojis or emoji shortcodes**, no headings or tables, one
@@ -70,12 +70,16 @@ pod only). The body is organized by the 2027 goals:
 *LLO network and multi-org model*
 <Area of work> | <One sentence on what was delivered, in plain language.>
 <Area of work> | ...
+• <Ticket number> <short plain title>
+• <Ticket number> <short plain title> (finished after close)
 
 *Platform health, security and support*
 <Area of work> | ...
+• <Ticket number> <short plain title>
 
 *Not tied to a 2027 goal*
 <Area of work> | ...
+• <Ticket number> <short plain title>
 
 *Still to come:* <what carries over and why, one or two lines.>
 
@@ -88,6 +92,10 @@ shipped, and which items carry into the next sprint and why (in QA, blocked, not
 _Details: <KEY>, <KEY> carried over · <KEY> not counted (no Team)_
 ```
 Rules:
+- **Bullets under each goal** list every ticket delivered under it, one per line. Write the
+  ticket number without the `CCCT-` prefix and link it (`<https://dimagi.atlassian.net/browse/CCCT-2917|2917>`
+  in Slack), then a short title in plain words. Mark tickets finished after the sprint closed.
+  Carried-over tickets go in "Still to come", not under a goal.
 - **Concise.** The whole report should fit one screen. Group tickets into areas of work (epic
   and component first; label your own grouping when tickets have no epic). Don't list tickets
   one by one.
