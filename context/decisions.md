@@ -62,5 +62,3 @@ key and op. Re-propose only if the ticket has materially changed since, and say 
 | 2026-11-04 | Mary Rocheleau | [CCC-482](https://dimagi.atlassian.net/browse/CCC-482) | Link as Duplicate of [CCC-477](https://dimagi.atlassian.net/browse/CCC-477) (supervisor app data) | Leave it |
 | 2026-11-04 | Mary Rocheleau | [CCC-471](https://dimagi.atlassian.net/browse/CCC-471) | Intake comment with a drafted problem statement (no health check endpoints today) | — |
 | 2026-11-04 | Mary Rocheleau | [CCC-108](https://dimagi.atlassian.net/browse/CCC-108) | Close as Won't Do, superseded by [CCC-299](https://dimagi.atlassian.net/browse/CCC-299) | Backwards: CCC-299 was merged into CCC-108, so CCC-108 is the keeper and stays open |
-| 2026-11-04 | Mary Rocheleau | [CI-815](https://dimagi.atlassian.net/browse/CI-815) | Nudge to Zandre: answer Shubham's 19 Oct `?latest=true` question; fix PR connect#1605 closed unmerged | — |
-| 2026-11-04 | Mary Rocheleau | [CI-1022](https://dimagi.atlassian.net/browse/CI-1022) | Nudge to Zandre: address changes requested on script PR hq#38324 | — |
