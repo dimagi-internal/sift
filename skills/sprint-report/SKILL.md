@@ -62,24 +62,30 @@ A short summary a PM reads in a minute, in the style of the team's earlier Slack
 (Sprint 98). Ticket keys go in the "Details" line only, not in the body. Write for people who
 don't read Jira: say what changed for workers, LLOs or staff, not what the ticket was called.
 
-Format (Slack: emoji shortcodes, no headings or tables, one pod only):
+Format (Slack: bold markers only. **No emojis or emoji shortcodes**, no headings or tables, one
+pod only). The body is organized by the 2027 goals:
 ```
-*Sprint <N> Summary — <Mon D> – <Mon D>, <year>*
-:iphone: *Mobile Pod*   (or :globe_with_meridians: Blue Pod / Green Pod)
+*<Pod> Pod — Sprint <N> Summary, <Mon D> – <Mon D>, <year>*
 
-:<emoji>: *<Area of work>* | <One sentence on what was delivered, in plain language.>
-:<emoji>: *<Area of work>* | ...            (4–6 lines, biggest first)
-:<emoji>: *<Area still open>* | Still to come: <what's left>.
+*Goal 4: LLO network and multi-org model*
+<Area of work> | <One sentence on what was delivered, in plain language.>
+<Area of work> | ...
 
-<Paragraph, 4–6 sentences: "Sprint <N> was a <steady/high-output/slower> sprint for the <pod>
+*Goal 3: Platform health, security and support*
+<Area of work> | ...
+
+*Not tied to a 2027 goal*
+<Area of work> | ...
+
+*Still to come:* <what carries over and why, one or two lines.>
+
+<Paragraph, 3–5 sentences: "Sprint <N> was a <steady/high-output/slower> sprint for the <pod>
 pod, with <X> of <Y> issues closed — highlighted by <the biggest delivery>." Then what else
 shipped, and which items carry into the next sprint and why (in QA, blocked, not started).>
 
-*Mix:* <S> stories, <T> tasks, <B> bugs<, D design> closed of <S'>/<T'>/<B'> committed (<pts> of <pts'> pts).
-*Goals:* <one line: which of the five 2027 goals the sprint moved, e.g. "Goal 4 (LLO network):
-LLO Directory and Solicitations. The rest is upkeep.">
+*Mix:* <S> stories, <T> tasks, <B> bugs<, D design> closed of <S'> / <T'> / <B'> committed (<pts> of <pts'> pts).
 *Epics finished:* <epic names, or "none">.
-_Details: <KEY>, <KEY> ... carried over · <KEY> not counted (no Team)_
+_Details: <KEY>, <KEY> carried over · <KEY> not counted (no Team)_
 ```
 Rules:
 - **Concise.** The whole report should fit one screen. Group tickets into areas of work (epic
@@ -91,8 +97,10 @@ Rules:
   finished since.
 - The Mix line gives story / task / bug counts and points, from `mix_completed` and `mix_all`.
   Bugs are mostly unpointed, so don't quote a bug share of points.
-- Goals come from `context/2027-themes.md`. Name a goal only where the work plainly serves it;
-  say "upkeep" for the rest and don't force a fit. Flag anything that conflicts with the
+- Goals come from `context/2027-themes.md`. Use only the goals the sprint touched, in order of
+  how much work each took (not goal-number order), and use the goal names as written there.
+  Put work under a goal only where it plainly serves it; the rest goes under "Not tied to a 2027
+  goal" (name it as upkeep) and is never forced into a fit. One area of work sits under one goal. Flag anything that conflicts with the
   Product Principles or `context/decisions.md`, the same as in any other skill.
 - An epic is "finished" only when `fully_finalized` is true and the epic wasn't already done
   before this sprint began.
