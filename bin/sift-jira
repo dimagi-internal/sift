@@ -21,7 +21,13 @@ Plan file (written by skills/clean-the-backlog, roadmap-intake and the other swe
      {"key": "CCCT-412", "op": "comment",    "body": "plain text", "why": "..."},
      {"key": "CCCT-412", "op": "transition", "to": "Won't Do",     "why": "..."},
      {"key": "CCCT-412", "op": "update",     "fields": {"priority": {"name": "Low"}}, "why": "..."},
-     {"key": "CCCT-412", "op": "link", "type": "Duplicate", "outward": "CCCT-388", "why": "..."}]}
+     {"key": "CCCT-412", "op": "link", "type": "Duplicate", "outward": "CCCT-388", "why": "..."},
+     {"op": "create", "ref": "tech-debt", "project": "CCC", "type": "Idea",
+      "fields": {"summary": "...", "description": "plain text", "customfield_14111": [...]}, "why": "..."},
+     {"key": "CCCT-2067", "op": "link", "type": "Polaris work item link", "outward": "$tech-debt", "why": "..."}]}
+  `create` makes a new issue; `description` is plain text (converted to ADF). Its `ref` names the
+  new key for later rows: write "$<ref>" as any later row's `key` or `outward`. A row whose ref
+  failed to create errors instead of running. In a dry run the ref stays a placeholder.
 
 Config (from ~/.sift/.env via bin/_env.py): sift_JIRA_SITE, sift_JIRA_EMAIL,
 sift_JIRA_API_TOKEN, sift_JIRA_PROJECTS.
@@ -249,8 +255,27 @@ def _utc(ts):
     return datetime.strptime(ts, "%Y-%m-%dT%H:%M:%S.%f%z").astimezone(timezone.utc).strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3] + "Z"
 
 
-def _apply_one(c):
-    key, op = c["key"], c["op"]
+def _resolve(v, refs):
+    if isinstance(v, str) and v.startswith("$"):
+        if v[1:] not in refs:
+            raise ValueError(f"unknown or failed ref {v!r}")
+        return refs[v[1:]]
+    return v
+
+
+def _apply_one(c, refs):
+    op = c["op"]
+    if op == "create":
+        fields = dict(c["fields"])
+        if isinstance(fields.get("description"), str):
+            fields["description"] = _adf(fields["description"])
+        fields["project"] = {"key": c["project"]}
+        fields["issuetype"] = {"name": c["type"]}
+        made = _call("POST", "/issue", {"fields": fields})
+        if c.get("ref"):
+            refs[c["ref"]] = made["key"]
+        return made["key"]
+    key = _resolve(c["key"], refs)
     if op == "comment":
         _call("POST", f"/issue/{key}/comment", {"body": _adf(c["body"])})
     elif op == "update":
@@ -264,7 +289,7 @@ def _apply_one(c):
         _call("POST", f"/issue/{key}/transitions", {"transition": {"id": hit["id"]}})
     elif op == "link":
         _call("POST", "/issueLink", {"type": {"name": c["type"]},
-                                     "inwardIssue": {"key": key}, "outwardIssue": {"key": c["outward"]}})
+                                     "inwardIssue": {"key": key}, "outwardIssue": {"key": _resolve(c["outward"], refs)}})
     else:
         raise ValueError(f"unknown op {op!r}")
 
@@ -274,15 +299,18 @@ def cmd_apply(a):
         sys.exit("--approved-by is required: name the human who approved this plan.")
     plan = json.load(open(a.plan, encoding="utf-8"))
     changes = plan.get("changes") or []
-    results = []
+    results, refs = [], {}
     for c in changes:
-        line = {"key": c.get("key"), "op": c.get("op"), "why": c.get("why")}
+        line = {"key": c.get("key") or f"(new {c.get('project')} {c.get('type')} ${c.get('ref')})",
+                "op": c.get("op"), "why": c.get("why")}
+        if c.get("op") == "link":
+            line["outward"] = c.get("outward")
         if a.dry_run:
             results.append({**line, "result": "dry-run"})
             continue
         try:
-            _apply_one(c)
-            results.append({**line, "result": "ok"})
+            made = _apply_one(c, refs)
+            results.append({**line, "result": "ok", **({"created": made} if made else {})})
         except (ValueError, KeyError, SystemExit) as e:
             results.append({**line, "result": f"error: {e}"})
     json.dump({"plan": plan.get("title"), "approved_by": a.approved_by, "dry_run": a.dry_run,
