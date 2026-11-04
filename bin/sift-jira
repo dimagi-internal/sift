@@ -127,7 +127,7 @@ def cmd_transitions(a):
 
 
 TEAM_BOARDS = {2830: "Blue", 2829: "Green", 2831: "Mobile"}  # CCCT scrum boards (342 "All Connect Tech" duplicates them)
-SPRINT_FIELDS = "summary,status,issuetype,parent,resolutiondate,assignee,components,customfield_10010,customfield_10017"
+SPRINT_FIELDS = "summary,status,issuetype,parent,resolutiondate,assignee,components,customfield_10010,customfield_10017,customfield_10001"
 
 
 def _agile(path, query=None):
@@ -177,14 +177,21 @@ def cmd_sprints(a):
 
 
 def _kind(t):
-    return t if t in ("Story", "Task", "Bug") else "Other"
+    return t if t in ("Story", "Task", "Bug", "Design", "Test") else "Other"
 
 
 def cmd_sprint_data(a):
     """Everything skills/sprint-report needs about one closed sprint, computed read-only."""
     sp = _agile(f"/sprint/{a.sprint_id}")
     closed_at = sp.get("completeDate") or sp.get("endDate")
-    issues = _jql_all(f"sprint = {a.sprint_id}", SPRINT_FIELDS)
+    pod = a.team or TEAM_BOARDS.get(sp.get("originBoardId"))
+    if pod not in TEAM_BOARDS.values():
+        sys.exit(f"--team Blue|Green|Mobile is required for sprint {a.sprint_id} (couldn't infer it from its board).")
+    # A report covers ONE pod. Blue and Green sometimes share a Jira sprint, so membership comes from the Team field.
+    all_issues = _jql_all(f"sprint = {a.sprint_id}", SPRINT_FIELDS)
+    team_of = lambda i: ((i["fields"].get("customfield_10001") or {}).get("name") or "")  # noqa: E731
+    issues = [i for i in all_issues if f"Connect: {pod} " in team_of(i) + " "]
+    excluded = [{"key": i["key"], "team": team_of(i) or None} for i in all_issues if i not in issues]
     name = lambda v: (v or {}).get("displayName") or (v or {}).get("name")  # noqa: E731
     rows, epics = [], {}
     for i in issues:
@@ -225,14 +232,14 @@ def cmd_sprint_data(a):
             b["unpointed"] += r["points"] is None
         return res
 
-    json.dump({"sprint": {"id": sp["id"], "name": sp["name"], "team": TEAM_BOARDS.get(sp.get("originBoardId"), sp.get("originBoardId")),
+    json.dump({"sprint": {"id": sp["id"], "name": sp["name"], "team": pod,
                           "start": sp.get("startDate"), "end": sp.get("endDate"), "completed": sp.get("completeDate"), "goal": sp.get("goal")},
                "totals": {"issues": len(rows), "completed": sum(r["completed"] for r in rows),
                           "dropped": sum(r["dropped"] for r in rows),
                           "points": sum(r["points"] or 0 for r in rows),
                           "points_completed": sum(r["points"] or 0 for r in rows if r["completed"])},
                "mix_all": mix(rows), "mix_completed": mix([r for r in rows if r["completed"]]),
-               "epics": epic_out, "issues": rows}, sys.stdout, indent=1)
+               "excluded_other_or_no_team": excluded, "epics": epic_out, "issues": rows}, sys.stdout, indent=1)
     print()
 
 
@@ -304,6 +311,7 @@ def main():
     sp.set_defaults(fn=cmd_sprints)
     sd = sub.add_parser("sprint-data")
     sd.add_argument("sprint_id", type=int)
+    sd.add_argument("--team", choices=sorted(TEAM_BOARDS.values()), help="pod whose tickets to report (Jira Team field)")
     sd.set_defaults(fn=cmd_sprint_data)
     ap = sub.add_parser("apply")
     ap.add_argument("plan")

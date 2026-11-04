@@ -20,21 +20,24 @@ Read first:
 - `context/capacity-snapshot.md`: the sprint's commitment and velocity, if it covers this sprint
 
 ## 1. Find sprints that need a report
-Each team (Blue, Green, Mobile) closes its own sprint under a shared number, usually within a
-day of each other. Sprint 101 is three Jira sprints. Blue and Green sometimes share one.
+**One report covers one pod: Blue, Green or Mobile, never a mix.** Each pod closes its own
+sprint under a shared number, usually within a day of the others. Blue and Green sometimes
+share a single Jira sprint, so a sprint's name or board does not tell you whose work it holds.
+**The Jira `Team` field does** (`Connect: Blue Web Team`, `Connect: Green Web Team`,
+`Connect: Mobile Team`). A pod's report contains only tickets whose Team is that pod.
 ```bash
 bin/sift-jira sprints --state closed --since <14 days ago>
 ```
-- Skip any sprint already reported: `canopy cursor since sprint-report --local ~/.sift/state --items - < "$T/closed.json"`
-  (give each sprint an `id` and a `ts` of its `completed` time). A named sprint ("report on
-  Sprint 101") skips the cursor.
-- Group by sprint number. If some of a number's team sprints haven't closed yet, say which are
-  still open and report on the ones that have, rather than waiting.
-- One report per sprint number, with a section per team, and a short overall section on top.
+- Each pod with a closed sprint gets its own report, written separately and never combined.
+  A sprint shared by Blue and Green is reported once for each pod, with that pod's `--team`.
+- Skip any pod-sprint already reported: `canopy cursor since sprint-report --local ~/.sift/state --items - < "$T/closed.json"`
+  (id = `<sprintId>-<pod>`, `ts` = the sprint's `completed` time). A named request ("Green
+  Sprint 101") skips the cursor. If the asker doesn't name a pod, list the pods with closed
+  sprints and ask which, or write one report per pod, each stand-alone.
 
 ## 2. Pull the data
 ```bash
-bin/sift-jira sprint-data <sprintId>     # one call per team sprint, run in parallel
+bin/sift-jira sprint-data <sprintId> --team Blue|Green|Mobile
 ```
 The output already does the counting. Use it as it is; don't recount from the issue list.
 - `completed`: Done by the time the sprint closed. `finished_after_close`: carried over, then
@@ -42,24 +45,28 @@ The output already does the counting. Use it as it is; don't recount from the is
   Everything else is **not completed**, with `carried_to` naming the sprint it moved to (empty
   means it went back to the backlog).
 - `mix_all` is the committed mix, `mix_completed` is the delivered mix, in issues and Story
-  Points, by Story / Task / Bug / Other. `unpointed` counts tickets with no estimate, so points
+  Points, by Story / Task / Bug / Design / Test / Other. `mix_all` includes dropped tickets, so
+  subtract them for "committed". `unpointed` counts tickets with no estimate, so points
   understate the mix wherever it is above zero (Bugs are mostly unpointed).
 - `epics`: per epic, how many children are done and `fully_finalized` (every child done and at
-  least one finished this sprint).
-- Limits worth stating once in the report: tickets removed from the sprint mid-way don't show up
-  (Jira keeps no sprint membership for them in a search), and the Team field is missing on some
-  tickets, so a team section is a lower bound.
+  least one finished this sprint). Children can belong to other pods, so say "all children done",
+  not "this pod finished it".
+- `excluded_other_or_no_team`: tickets in the sprint whose Team is another pod or empty. They
+  are NOT in the report's numbers. List them in one line at the end ("not counted: CCCT-2980,
+  no Team set") so the pod can fix the field.
+- Limits worth stating once: tickets removed from the sprint mid-way don't show up (Jira keeps no
+  membership for them in a search).
 
 ## 3. Write the report
 Plain language for product people, who read the ticket keys, not the tool output. Link every key
 as `https://dimagi.atlassian.net/browse/<KEY>`. Keep it to what a PM can read in two minutes.
 
 ```
-# Sprint <N> report — <date range>
+# <Pod> Sprint <N> report — <date range>
 
-**Overall:** <issues completed>/<committed> tickets (<points completed>/<points> pts) across
-<teams>. <One or two sentences: the headline, e.g. a strong sprint, or most of the miss is one
-epic.>
+**Overall:** <issues completed>/<committed> tickets (<points completed>/<points> pts)
+for the <pod> pod. <One or two sentences: the headline, e.g. a strong sprint, or most of the
+miss is one epic.>
 
 ## What was completed
 <Grouped by area of work, not by ticket order. One line per ticket: key, plain-language summary,
@@ -86,13 +93,12 @@ for platform upkeep and don't force a fit.>
 | Stories | n (pts) | n (pts) | % |
 | Tasks | | | |
 | Bugs | | | |
-| Other | | | |
+| Design / Other | | | |
 <One sentence on what the split says, e.g. a bug-heavy sprint. Use issue counts for the share
 and add points only where most tickets are pointed. Say which one you used.>
 
-## By team
-<Blue / Green / Mobile: tickets and points completed vs committed, one line each, plus anything
-particular to that team.>
+## Not counted
+<Tickets in the sprint filed under another team or no team, one line. Omit if none.>
 ```
 Rules:
 - Count only what the data says. A ratio like "73% complete" needs the numerator and the
