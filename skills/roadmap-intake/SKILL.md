@@ -13,8 +13,9 @@ argument-hint: "[--days 14] [--full] [--max 40]"
 # Roadmap intake — Sift
 
 Reads are free; Jira writes happen only via `bin/sift-jira apply` on a plan a human approved.
-This skill covers **new** CCC ideas only. The whole-backlog sweep (stale, drift, CCCT hygiene)
-is `sift:backlog-triage`; it can skip anything this skill reviewed in the same turn.
+This skill covers **new** CCC ideas only. The CCCT delivery backlog sweep is
+`sift:backlog-triage`, which does not check CCC fields; stale CCC items go through
+`sift:review-stale-tickets CCC`.
 
 ## 1. Scope
 - Read `context/2027-themes.md` (the five goals and what each covers — your Goal lens) and

@@ -98,8 +98,9 @@ partners and funders see their own data without asking Dimagi.
   "none") using the "What each goal covers" lists above, alongside Product Area and Platform.
 - **Rank by goal.** In triage reports and prioritization answers, lead with work that moves a
   goal's metric. The goals are unordered — don't rank one goal above another; rank items by how
-  directly they move a goal. Priority drift includes P1–P3 / Prioritized items with no Goal, and
-  goal-tagged items sitting stale.
+  directly they move a goal. Priority drift means planned items (Prioritization set and not
+  `Backlog`) with no Goal, and goal-tagged items sitting stale. Never use Jira's P1–P6
+  `priority` field (ruling 2026-11-04).
 - **Off-goal work is a finding, not a defect.** Report the count of open CCC items with no Goal,
   and call out the in-flight ones (Prioritized / Implementation / Technical Spec) — those are
   the ones a PM should either tie to a goal or deprioritize. Don't propose closing an item just

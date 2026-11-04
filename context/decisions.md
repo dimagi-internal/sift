@@ -39,6 +39,8 @@ page (`skills/product-principles`). This file holds how *Sift* should triage, ra
 | 2026-11-03 | Mary Rocheleau | Shipping | Capacity snapshot refreshes are shipped by Mary. Sift leaves them uncommitted and hands her the command. | `skills/capacity-refresh` |
 | 2026-11-04 | Mary Rocheleau | Grooming prep | Prep team by team (Blue, Green, Mobile), each on its own. Focus on the CCCT tickets planned in the team's next sprint: check component, acceptance criteria, linked issues and description, and suggest the changes needed. Then review capacity. | `skills/grooming-prep`, `context/definition-of-ready.md` |
 | 2026-11-04 | Mary Rocheleau | CCC archived ideas | Exclude archived CCC ideas from sweeps, stale reviews and counts. Product Discovery archives ideas (e.g. on merge) without changing status; filter with `cf[10336] is EMPTY AND cf[10338] is EMPTY`. | `skills/backlog-triage`, `skills/review-stale-tickets` |
+| 2026-11-04 | Mary Rocheleau | Jira priority | Don't use Jira's P1–P6 `priority` field for any judgment: "we don't use that". Rank by CCC Prioritization. | `skills/backlog-triage`, `context/2027-themes.md` |
+| 2026-11-04 | Mary Rocheleau | backlog-triage scope | backlog-triage keeps the CCCT backlog clean. It doesn't check CCC fields roadmap-intake covers. It still checks that every CCCT epic links to a CCC item. | `skills/backlog-triage`, `skills/roadmap-intake` |
 | 2026-11-04 | Mary Rocheleau | CCC intake comments | Drafted problem-statement comments are the statement alone: no "Proposed problem statement" header, no "Supports goal …" tag, no named follow-ups. Reviewed one at a time before posting. | `skills/roadmap-intake` |
 
 ## Declined changes
