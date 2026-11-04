@@ -16,7 +16,7 @@ Usage:
   bin/sift-jira sprint-data 6527          -> one sprint: completed vs not, type mix, epics (skills/sprint-report)
   bin/sift-jira apply plan.json --approved-by "<name>" [--dry-run]
 
-Plan file (written by skills/backlog-triage):
+Plan file (written by skills/clean-the-backlog, roadmap-intake and the other sweep skills):
   {"title": "...", "changes": [
      {"key": "CCCT-412", "op": "comment",    "body": "plain text", "why": "..."},
      {"key": "CCCT-412", "op": "transition", "to": "Won't Do",     "why": "..."},

@@ -8,7 +8,7 @@
     {
       "tool_pattern": "^mcp__.*__(?:createJiraIssue|editJiraIssue|transitionJiraIssue|addCommentToJiraIssue|createIssueLink|addWorklogToJiraIssue)$",
       "_pattern_doc": "Atlassian MCP write tools (any server mount). Reads (getJiraIssue, searchJiraIssuesUsingJql, ...) stay free.",
-      "message": "BLOCKED: Sift never writes to Jira through the Atlassian MCP. Put the change in a plan file and, once a human approves it, run: bin/sift-jira apply <plan.json> --approved-by \"<name>\" (see skills/backlog-triage)."
+      "message": "BLOCKED: Sift never writes to Jira through the Atlassian MCP. Put the change in a plan file and, once a human approves it, run: bin/sift-jira apply <plan.json> --approved-by \"<name>\" (see skills/clean-the-backlog)."
     },
     {
       "tool": "Bash",

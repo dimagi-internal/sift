@@ -29,7 +29,7 @@ page (`skills/product-principles`). This file holds how *Sift* should triage, ra
 |---|---|---|---|---|
 | 2026-10-27 | Mary Rocheleau | CCC Goal | Sift proposes Goals and never sets them without approval. PersonalID recovery items were deliberately left out of goal 01; don't re-propose them, and raise them only as a coverage gap. | `context/2027-themes.md` |
 | 2026-10-27 | Mary Rocheleau | CCC Goal | Don't propose closing a CCC item just because it has no Goal. Off-goal work is a finding, not a defect. | `context/2027-themes.md` |
-| 2026-10-27 | Mary Rocheleau | CCCT Team | Test tickets are exempt from the web team check. | `skills/backlog-triage` |
+| 2026-10-27 | Mary Rocheleau | CCCT Team | Test tickets are exempt from the web team check. | `skills/clean-the-backlog` |
 | 2026-11-03 | Mary Rocheleau | 2027 goals | The five goals are not in priority order. Rank items by how directly they move a goal, never one goal over another. | `context/2027-themes.md` |
 | 2026-11-03 | Mary Rocheleau | CCCT fields | Ignore `Connect Release Path`: don't flag it, propose it or rank by it. | `context/delivery-model.md` |
 | 2026-11-03 | Mary Rocheleau | CCC Prioritization | Connect doesn't commit by quarter. CCC items with Prioritization = `Backlog` are "not currently going to be worked": they're parked, not stuck. Don't nudge them, count them as load, or close them for age. | `context/delivery-model.md` |
@@ -38,9 +38,10 @@ page (`skills/product-principles`). This file holds how *Sift* should triage, ra
 | 2026-11-03 | Mary Rocheleau | Cadence | Grooming is Thursday. Sift runs a backlog sweep Tuesday and grooming prep Wednesday (08:00 ET), on Mary's machine when it's on. | canopy-web schedules 31, 32 |
 | 2026-11-03 | Mary Rocheleau | Shipping | Capacity snapshot refreshes are shipped by Mary. Sift leaves them uncommitted and hands her the command. | `skills/capacity-refresh` |
 | 2026-11-04 | Mary Rocheleau | Grooming prep | Prep team by team (Blue, Green, Mobile), each on its own. Focus on the CCCT tickets planned in the team's next sprint: check component, acceptance criteria, linked issues and description, and suggest the changes needed. Then review capacity. | `skills/grooming-prep`, `context/definition-of-ready.md` |
-| 2026-11-04 | Mary Rocheleau | CCC archived ideas | Exclude archived CCC ideas from sweeps, stale reviews and counts. Product Discovery archives ideas (e.g. on merge) without changing status; filter with `cf[10336] is EMPTY AND cf[10338] is EMPTY`. | `skills/backlog-triage`, `skills/review-stale-tickets` |
-| 2026-11-04 | Mary Rocheleau | Jira priority | Don't use Jira's P1–P6 `priority` field for any judgment: "we don't use that". Rank by CCC Prioritization. | `skills/backlog-triage`, `context/2027-themes.md` |
-| 2026-11-04 | Mary Rocheleau | backlog-triage scope | backlog-triage keeps the CCCT backlog clean. It doesn't check CCC fields roadmap-intake covers. It still checks that every CCCT epic links to a CCC item. | `skills/backlog-triage`, `skills/roadmap-intake` |
+| 2026-11-04 | Mary Rocheleau | CCC archived ideas | Exclude archived CCC ideas from sweeps, stale reviews and counts. Product Discovery archives ideas (e.g. on merge) without changing status; filter with `cf[10336] is EMPTY AND cf[10338] is EMPTY`. | `skills/clean-the-backlog`, `skills/review-stale-tickets` |
+| 2026-11-04 | Mary Rocheleau | Jira priority | Don't use Jira's P1–P6 `priority` field for any judgment: "we don't use that". Rank by CCC Prioritization. | `skills/clean-the-backlog`, `context/2027-themes.md` |
+| 2026-11-04 | Mary Rocheleau | clean-the-backlog scope | clean-the-backlog (was backlog-triage) keeps the CCCT backlog clean. It doesn't check CCC fields roadmap-intake covers. It still checks that every CCCT epic links to a CCC item. | `skills/clean-the-backlog`, `skills/roadmap-intake` |
+| 2026-11-04 | Mary Rocheleau | clean-the-backlog vs grooming prep | Remove what overlaps with grooming prep: clean-the-backlog skips tickets in the next sprint and reports no capacity. Renamed from backlog-triage to "clean the backlog". | `skills/clean-the-backlog` |
 | 2026-11-04 | Mary Rocheleau | CCC intake comments | Drafted problem-statement comments are the statement alone: no "Proposed problem statement" header, no "Supports goal …" tag, no named follow-ups. Reviewed one at a time before posting. | `skills/roadmap-intake` |
 
 ## Declined changes
