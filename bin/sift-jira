@@ -12,6 +12,8 @@ Usage:
       -> JSON array of {id, ts, key, summary, status, ...}; pipe into `canopy cursor since`.
   bin/sift-jira issue CCCT-412            -> one issue, full fields + links + comments + changelog
   bin/sift-jira transitions CCCT-412      -> statuses this issue can move to right now
+  bin/sift-jira sprints [--state closed] [--since 2026-10-01]   -> sprints on the Blue/Green/Mobile boards
+  bin/sift-jira sprint-data 6527          -> one sprint: completed vs not, type mix, epics (skills/sprint-report)
   bin/sift-jira apply plan.json --approved-by "<name>" [--dry-run]
 
 Plan file (written by skills/backlog-triage):
@@ -124,6 +126,122 @@ def cmd_transitions(a):
     print()
 
 
+TEAM_BOARDS = {2830: "Blue", 2829: "Green", 2831: "Mobile"}  # CCCT scrum boards (342 "All Connect Tech" duplicates them)
+SPRINT_FIELDS = "summary,status,issuetype,parent,resolutiondate,assignee,components,customfield_10010,customfield_10017"
+
+
+def _agile(path, query=None):
+    base, headers = _client()
+    url = base.replace("/rest/api/3", "/rest/agile/1.0") + path + ("?" + urllib.parse.urlencode(query) if query else "")
+    try:
+        with urllib.request.urlopen(urllib.request.Request(url, headers=headers), timeout=60) as r:
+            return json.loads(r.read())
+    except urllib.error.HTTPError as e:
+        sys.exit(f"Jira GET {path} -> {e.code}: {e.read().decode(errors='replace')[:500]}")
+
+
+def _jql_all(jql, fields):
+    out, token = [], None
+    while True:
+        q = {"jql": jql, "fields": fields, "maxResults": 100}
+        if token:
+            q["nextPageToken"] = token
+        page = _call("GET", "/search/jql", query=q)
+        out += page.get("issues", [])
+        token = page.get("nextPageToken")
+        if not token:
+            return out
+
+
+def cmd_sprints(a):
+    """Closed (or any-state) sprints on the three team boards, newest first."""
+    out = []
+    for board, team in TEAM_BOARDS.items():
+        start = 0
+        while True:
+            page = _agile(f"/board/{board}/sprint", {"state": a.state, "startAt": start, "maxResults": 50})
+            for s in page.get("values", []):
+                day = (s.get("completeDate") or s.get("endDate") or "")[:10]
+                if day >= a.since:
+                    if any(o["id"] == s["id"] for o in out):  # sprint shared by Blue + Green boards
+                        next(o for o in out if o["id"] == s["id"])["team"] += f"+{team}"
+                        continue
+                    out.append({"id": s["id"], "team": team, "name": s["name"], "state": s["state"],
+                                "start": s.get("startDate"), "end": s.get("endDate"), "completed": s.get("completeDate")})
+            if page.get("isLast", True):
+                break
+            start += 50
+    out.sort(key=lambda s: s["completed"] or s["end"] or "", reverse=True)
+    json.dump(out, sys.stdout, indent=1)
+    print()
+
+
+def _kind(t):
+    return t if t in ("Story", "Task", "Bug") else "Other"
+
+
+def cmd_sprint_data(a):
+    """Everything skills/sprint-report needs about one closed sprint, computed read-only."""
+    sp = _agile(f"/sprint/{a.sprint_id}")
+    closed_at = sp.get("completeDate") or sp.get("endDate")
+    issues = _jql_all(f"sprint = {a.sprint_id}", SPRINT_FIELDS)
+    name = lambda v: (v or {}).get("displayName") or (v or {}).get("name")  # noqa: E731
+    rows, epics = [], {}
+    for i in issues:
+        f = i["fields"]
+        resolved = f.get("resolutiondate")
+        is_done = f["status"]["statusCategory"]["key"] == "done"
+        dropped = is_done and f["status"]["name"].lower() in ("won't do", "wont do", "duplicate", "cancelled", "rejected")
+        # Done only counts if it was resolved by the time the sprint closed; later = carried over, finished afterwards.
+        done_in_sprint = is_done and not dropped and bool(resolved) and _utc(resolved) <= closed_at
+        later = [s["name"] for s in f.get("customfield_10010") or [] if s["id"] != sp["id"] and s["state"] != "closed"]
+        later += [s["name"] for s in f.get("customfield_10010") or [] if s["id"] != sp["id"] and s["state"] == "closed"
+                  and (s.get("completeDate") or "") > closed_at]
+        par = f.get("parent") or {}
+        epic = par["key"] if (par.get("fields") or {}).get("issuetype", {}).get("name") == "Epic" else None
+        if epic:
+            epics.setdefault(epic, par["fields"]["summary"])
+        rows.append({"key": i["key"], "summary": f["summary"], "type": f["issuetype"]["name"], "kind": _kind(f["issuetype"]["name"]),
+                     "status": f["status"]["name"], "points": f.get("customfield_10017"), "assignee": name(f.get("assignee")),
+                     "components": [c["name"] for c in f.get("components") or []], "epic": epic,
+                     "completed": done_in_sprint, "dropped": dropped, "resolved": resolved,
+                     "finished_after_close": is_done and not dropped and not done_in_sprint,
+                     "carried_to": later})
+    epic_out = []
+    for key, title in epics.items():
+        kids = _jql_all(f"parent = {key}", "status,resolutiondate")
+        done = sum(k["fields"]["status"]["statusCategory"]["key"] == "done" for k in kids)
+        in_sprint = [r for r in rows if r["epic"] == key]
+        epic_out.append({"key": key, "summary": title, "children": len(kids), "children_done": done,
+                         "in_sprint": len(in_sprint), "completed_in_sprint": sum(r["completed"] for r in in_sprint),
+                         "fully_finalized": bool(kids) and done == len(kids) and any(r["completed"] for r in in_sprint)})
+
+    def mix(sel):
+        res = {}
+        for r in sel:
+            b = res.setdefault(r["kind"], {"count": 0, "points": 0, "unpointed": 0})
+            b["count"] += 1
+            b["points"] += r["points"] or 0
+            b["unpointed"] += r["points"] is None
+        return res
+
+    json.dump({"sprint": {"id": sp["id"], "name": sp["name"], "team": TEAM_BOARDS.get(sp.get("originBoardId"), sp.get("originBoardId")),
+                          "start": sp.get("startDate"), "end": sp.get("endDate"), "completed": sp.get("completeDate"), "goal": sp.get("goal")},
+               "totals": {"issues": len(rows), "completed": sum(r["completed"] for r in rows),
+                          "dropped": sum(r["dropped"] for r in rows),
+                          "points": sum(r["points"] or 0 for r in rows),
+                          "points_completed": sum(r["points"] or 0 for r in rows if r["completed"])},
+               "mix_all": mix(rows), "mix_completed": mix([r for r in rows if r["completed"]]),
+               "epics": epic_out, "issues": rows}, sys.stdout, indent=1)
+    print()
+
+
+def _utc(ts):
+    """Jira '2026-11-03T10:16:35.584-0500' -> '2026-11-03T15:16:35.584Z' (sortable against agile API UTC stamps)."""
+    from datetime import datetime, timezone
+    return datetime.strptime(ts, "%Y-%m-%dT%H:%M:%S.%f%z").astimezone(timezone.utc).strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3] + "Z"
+
+
 def _apply_one(c):
     key, op = c["key"], c["op"]
     if op == "comment":
@@ -180,6 +298,13 @@ def main():
     t = sub.add_parser("transitions")
     t.add_argument("key")
     t.set_defaults(fn=cmd_transitions)
+    sp = sub.add_parser("sprints")
+    sp.add_argument("--state", default="closed", help="closed | active | future (default closed)")
+    sp.add_argument("--since", default="2000-01-01", help="only sprints closed/ending on or after YYYY-MM-DD")
+    sp.set_defaults(fn=cmd_sprints)
+    sd = sub.add_parser("sprint-data")
+    sd.add_argument("sprint_id", type=int)
+    sd.set_defaults(fn=cmd_sprint_data)
     ap = sub.add_parser("apply")
     ap.add_argument("plan")
     ap.add_argument("--approved-by", required=True)
