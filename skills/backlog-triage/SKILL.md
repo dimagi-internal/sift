@@ -25,7 +25,7 @@ Capability lives in `bin/sift-jira`; this skill is the judgment around it.
 - Projects: `sift_JIRA_PROJECTS` (default `CCC,CCCT`). `CI` (Connect Interrupt) is out of scope
   here — it gets its own weekly `sift:review-interrupt` run.
 - New CCC ideas get the intake bar (Prioritization, Goal, description, 1–2 Product Areas) in
-  `sift:ccc-intake`. On the Tuesday sweep run it first, and skip ideas it already reviewed this turn.
+  `sift:roadmap-intake`. On the Tuesday sweep run it first, and skip ideas it already reviewed this turn.
 - If the asker named a narrower slice (an epic, a component, "just bugs"), use that and say so.
 - Read `context/decisions.md`: standing rulings and declined changes. Never re-propose a
   declined change or act against a ruling.

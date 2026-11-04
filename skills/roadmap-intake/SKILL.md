@@ -1,16 +1,16 @@
 ---
-name: ccc-intake
+name: roadmap-intake
 description: >
   Sift's intake triage for NEW items in the CCC roadmap backlog — check every idea created
   since the last run for the four intake basics (Prioritization, Goal, a good description,
   1–2 Product Areas), propose the missing values and a drafted problem statement, get the
   batch approved, then apply it with bin/sift-jira. Use when asked to "triage new CCC items",
-  "review new ideas", "what came into the roadmap this week", "intake", or on the Tuesday sweep
+  "roadmap intake", "review new ideas", "what came into the roadmap this week", "intake", or on the Tuesday sweep
   before backlog-triage.
 argument-hint: "[--days 14] [--full] [--max 40]"
 ---
 
-# CCC intake — Sift
+# Roadmap intake — Sift
 
 Reads are free; Jira writes happen only via `bin/sift-jira apply` on a plan a human approved.
 This skill covers **new** CCC ideas only. The whole-backlog sweep (stale, drift, CCCT hygiene)
@@ -22,7 +22,7 @@ is `sift:backlog-triage`; it can skip anything this skill reviewed in the same t
   change, never act against a ruling).
 - Read the live Product Principles (`bin/sift-confluence page 4480958467`). A new idea that
   conflicts with one is a flag: quote and link the principle (`skills/product-principles`).
-- **New** = created since the last intake run. Cursor `ccc-intake` in `~/.sift/state`. First run
+- **New** = created since the last intake run. Cursor `roadmap-intake` in `~/.sift/state`. First run
   or `--full`: everything created in the last `--days` (default 14). If the asker named keys or
   a window, use those and say so.
 
@@ -31,7 +31,7 @@ is `sift:backlog-triage`; it can skip anything this skill reviewed in the same t
 T=$(mktemp -d); N=14
 bin/sift-jira search --max 200 --jql "project = CCC AND statusCategory != Done \
   AND cf[10336] is EMPTY AND cf[10338] is EMPTY AND created >= -${N}d ORDER BY created ASC" > "$T/new.json"
-canopy cursor since ccc-intake --local ~/.sift/state --items - < "$T/new.json" > "$T/todo.json"
+canopy cursor since roadmap-intake --local ~/.sift/state --items - < "$T/new.json" > "$T/todo.json"
 ```
 The `cf[10336]`/`cf[10338]` clauses drop archived ideas (ruling 2026-11-04). The cursor keys
 on `{id, ts}`, so an idea edited since it was last reviewed comes back — re-check it; if it now
@@ -113,7 +113,7 @@ line. Log struck lines in `context/decisions.md` (Declined changes) and any rule
 under Standing rulings. Then:
 ```bash
 bin/sift-jira apply plan.json --approved-by "<approver's name>"
-canopy cursor bump ccc-intake --local ~/.sift/state --items - < "$T/todo.json"
+canopy cursor bump roadmap-intake --local ~/.sift/state --items - < "$T/todo.json"
 ```
 Bump with every idea you reviewed, including ones that passed. Re-pull the rows after applying and bump those, so your own comments don't make an idea look edited next run. Report what applied and anything
 that errored, one line each.
