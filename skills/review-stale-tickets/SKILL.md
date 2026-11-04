@@ -90,6 +90,12 @@ item's scope or target date.
 | Defining Requirements / Requirements Validation / Technical Specification, stuck | **nudge** the assignee; **flag** if unassigned |
 | Implementation with no linked CCCT work, or all of it Done | **flag** (no delivery) / **nudge** to move to Rollout Planning or Done |
 
+Before calling a CCC item superseded through a `Polaris merge work item link`, confirm which
+side is the keeper. The link's "merged into" / "merged from" label as the API reports it can read
+backwards (CCC-108 showed "merged into CCC-299", but CCC-299 had been merged into it; Mary,
+2026-11-04). The item that was merged in is usually archived (and drops out of the JQL); the one
+still open is normally the keeper. Unsure → flag it, don't close.
+
 Before any `transition`, check the target is reachable: `bin/sift-jira transitions <KEY>`
 (CCC's Won't Do and CCCT's Won't Do are different statuses with the same name).
 
