@@ -2,8 +2,8 @@
 name: sprint-report
 description: >
   Write the summary report for a Connect sprint that has just closed in Jira: what was
-  completed, what wasn't (and where it went), the general areas of work, which epics were
-  fully finalized, and how the sprint split across stories, tasks and bugs. Use when a sprint
+  completed, what carried over, the areas of work and the 2027 goals they serve, which epics
+  finished, and the story / task / bug split. One pod per report, kept short. Use when a sprint
   closes (on Sift's schedule it checks for newly closed sprints), or when asked for a "sprint
   report", "sprint summary", "what did we finish in Sprint 101" or "how did the sprint go".
 ---
@@ -58,58 +58,46 @@ The output already does the counting. Use it as it is; don't recount from the is
   membership for them in a search).
 
 ## 3. Write the report
-Plain language for product people, who read the ticket keys, not the tool output. Link every key
-as `https://dimagi.atlassian.net/browse/<KEY>`. Keep it to what a PM can read in two minutes.
+A short summary a PM reads in a minute, in the style of the team's earlier Slack summaries
+(Sprint 98). Ticket keys go in the "Details" line only, not in the body. Write for people who
+don't read Jira: say what changed for workers, LLOs or staff, not what the ticket was called.
 
+Format (Slack: emoji shortcodes, no headings or tables, one pod only):
 ```
-# <Pod> Sprint <N> report — <date range>
+*Sprint <N> Summary — <Mon D> – <Mon D>, <year>*
+:iphone: *Mobile Pod*   (or :globe_with_meridians: Blue Pod / Green Pod)
 
-**Overall:** <issues completed>/<committed> tickets (<points completed>/<points> pts)
-for the <pod> pod. <One or two sentences: the headline, e.g. a strong sprint, or most of the
-miss is one epic.>
+:<emoji>: *<Area of work>* | <One sentence on what was delivered, in plain language.>
+:<emoji>: *<Area of work>* | ...            (4–6 lines, biggest first)
+:<emoji>: *<Area still open>* | Still to come: <what's left>.
 
-## What was completed
-<Grouped by area of work, not by ticket order. One line per ticket: key, plain-language summary,
-who. Say when a group of tickets together delivers something a PM would name.>
+<Paragraph, 4–6 sentences: "Sprint <N> was a <steady/high-output/slower> sprint for the <pod>
+pod, with <X> of <Y> issues closed — highlighted by <the biggest delivery>." Then what else
+shipped, and which items carry into the next sprint and why (in QA, blocked, not started).>
 
-## What was not completed
-<Each ticket: key, summary, status when the sprint closed, and where it went (next sprint /
-backlog). Group by reason when it is plain from the ticket (blocked, started late, bigger than
-estimated, bug found late); otherwise don't guess. Won't Do / Duplicate tickets go in a
-separate one-line "closed without delivery" note, not here.>
-
-## Areas of work
-<3–6 themes the sprint touched, each with ticket count and share of the sprint. Name the 2027
-goal each one serves where it plainly does (`context/2027-themes.md`); say "no clear goal"
-for platform upkeep and don't force a fit.>
-
-## Epics
-- **Fully finalized:** <epic key, name, N of N children done. Or "None this sprint".>
-- **Moved forward:** <epic, children done / total, what's left. Only epics with work this sprint.>
-
-## Stories, tasks and bugs
-| | Committed | Completed | Share of completed |
-|---|---|---|---|
-| Stories | n (pts) | n (pts) | % |
-| Tasks | | | |
-| Bugs | | | |
-| Design / Other | | | |
-<One sentence on what the split says, e.g. a bug-heavy sprint. Use issue counts for the share
-and add points only where most tickets are pointed. Say which one you used.>
-
-## Not counted
-<Tickets in the sprint filed under another team or no team, one line. Omit if none.>
+*Mix:* <S> stories, <T> tasks, <B> bugs<, D design> closed of <S'>/<T'>/<B'> committed (<pts> of <pts'> pts).
+*Goals:* <one line: which of the five 2027 goals the sprint moved, e.g. "Goal 4 (LLO network):
+LLO Directory and Solicitations. The rest is upkeep.">
+*Epics finished:* <epic names, or "none">.
+_Details: <KEY>, <KEY> ... carried over · <KEY> not counted (no Team)_
 ```
 Rules:
-- Count only what the data says. A ratio like "73% complete" needs the numerator and the
-  denominator next to it.
-- Don't judge people or teams. Say what slipped and where it went, not who failed.
-- Measure "areas of work" from the epics and components first. Group tickets with no epic by
-  their summary and label them as your grouping.
-- Flag anything that conflicts with `context/decisions.md` or the Product Principles, the same
-  as in any other skill. Don't re-litigate.
-- If the sprint's commitment or velocity is in the capacity snapshot, give one line comparing
-  delivered points with it. If the snapshot predates the sprint, skip the comparison.
+- **Concise.** The whole report should fit one screen. Group tickets into areas of work (epic
+  and component first; label your own grouping when tickets have no epic). Don't list tickets
+  one by one.
+- Issue counts in the paragraph are *closed of committed*, with Won't Do / Duplicate tickets
+  left out of "committed". Say so only if it changes the picture.
+- A ticket finished after the sprint closed counts as carried over, and the paragraph says it
+  finished since.
+- The Mix line gives story / task / bug counts and points, from `mix_completed` and `mix_all`.
+  Bugs are mostly unpointed, so don't quote a bug share of points.
+- Goals come from `context/2027-themes.md`. Name a goal only where the work plainly serves it;
+  say "upkeep" for the rest and don't force a fit. Flag anything that conflicts with the
+  Product Principles or `context/decisions.md`, the same as in any other skill.
+- An epic is "finished" only when `fully_finalized` is true and the epic wasn't already done
+  before this sprint began.
+- Tickets in `excluded_other_or_no_team` are not in the numbers. Name them in the Details line.
+- Don't judge people. Say what slipped and where it went, not who is behind.
 
 ## 4. Present and record
 Put the report in the turn's reply (canopy-web relays it to the asker). If the turn was
