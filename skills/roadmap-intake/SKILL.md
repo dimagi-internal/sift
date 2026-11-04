@@ -2,8 +2,8 @@
 name: roadmap-intake
 description: >
   Sift's intake triage for NEW items in the CCC roadmap backlog — check every idea created
-  since the last run for the four intake basics (Prioritization, Goal, a good description,
-  1–2 Product Areas), propose the missing values and a drafted problem statement, get the
+  since the last run for the intake basics (Prioritization, Goal, a good description,
+  1–2 Product Areas, and Product Pod once prioritized), propose the missing values and a drafted problem statement, get the
   batch approved, then apply it with bin/sift-jira. Use when asked to "triage new CCC items",
   "roadmap intake", "review new ideas", "what came into the roadmap this week", "intake", or on the Tuesday sweep
   before clean-the-backlog.
@@ -38,12 +38,22 @@ The `cf[10336]`/`cf[10338]` clauses drop archived ideas (ruling 2026-11-04). The
 on `{id, ts}`, so an idea edited since it was last reviewed comes back — re-check it; if it now
 passes, it produces no finding.
 
-Rows carry `prioritization`, `goal`, `product_area`, `platform`, `has_description`. Read each
+**Product Pod sweep (all planned items, not just new ones).** Product Pod is required on
+everything prioritized (ruling 2026-11-04), so also pull every live CCC item with
+Prioritization set and not `Backlog` and Product Pod empty — check 5 below applies to these
+whether or not they're new:
+```bash
+bin/sift-jira search --max 500 --jql "project = CCC AND statusCategory != Done \
+  AND cf[10336] is EMPTY AND cf[10338] is EMPTY AND cf[12800] in ('Must Have','Nice to Have','Could Have') \
+  AND cf[11029] is EMPTY" > "$T/pod.json"
+```
+
+Rows carry `prioritization`, `goal`, `product_area`, `platform`, `product_pod`, `has_description`. Read each
 idea in full before judging it: `bin/sift-jira issue <KEY>` (description, comments, links —
 e.g. the `CI-` interrupt or CCCT ticket it came from). To spot duplicates, keep the open-CCC
 list handy (`project = CCC AND statusCategory != Done AND cf[10336] is EMPTY AND cf[10338] is EMPTY`).
 
-## 3. The intake bar — four checks per idea
+## 3. The intake bar — five checks per idea
 
 | # | Check | Passes when | Proposed change |
 |---|---|---|---|
@@ -51,6 +61,7 @@ list handy (`project = CCC AND statusCategory != Done AND cf[10336] is EMPTY AND
 | 2 | **Goal** | `Goal` (`customfield_14111`) has 1+ of the five goals, or the idea is deliberately off-goal | `update` with the goal(s) it directly serves, citing the "What each goal covers" bullet it matches; if none fits, propose **no Goal** and say so in the report (not a defect) |
 | 3 | **Good description** | A PM could pick it up cold: **who** is affected, **what goes wrong today** (the problem, not only the solution), and **why it matters** / what better looks like. Links to the source (CI ticket, Slack, doc) are a plus | `comment` with a drafted 2–4 line problem statement for the reporter to confirm and paste in: the statement alone, no header, no goal tag, no names (ruling 2026-11-04). Never overwrite the description. Skip an idea that already has an intake comment |
 | 4 | **Product Area** | `Product Area` (`customfield_10448`) has **1 or 2** values | 0 → `update` with the 1–2 best fits; 3+ → `update` down to the 2 that fit best (say which were dropped). Values must match Jira's list exactly — see below |
+| 5 | **Product Pod** | Only when Prioritization is (or this plan proposes) `Must Have`, `Nice to Have` or `Could Have`: `Product Pod` (`customfield_11029`) is set. Not required on `Backlog` items | `update` with one value + a one-line reason — see "Judging Product Pod" |
 
 Also fill **Platform** (`customfield_10434`, `Web` / `Mobile`) when it's empty and obvious from
 the idea — Product Area isn't a stand-in for it.
@@ -65,6 +76,21 @@ default P6. Ignore it; Prioritization is what the team ranks by.
   forces timing (a live program blocked, a security finding, a principle being violated in
   production). Otherwise `Nice` / `Could` for on-goal work worth planning, `Backlog` for the rest.
 - If you can't tell, propose `Backlog` and put the question in **Flags** for the PM.
+
+### Judging Product Pod
+Product Pod says how much the product team must put in to move the item forward
+(ruling 2026-11-04). Exactly one of:
+- `Leads` — product owns it: user-facing behaviour or workflow that needs discovery, design
+  or a product decision before engineering can start (e.g. how FLWs see rejected visits,
+  notification strategy, solicitation-to-contract).
+- `Inputs` — product shapes it but doesn't drive it: requirements, edge cases or sign-off
+  from product, with engineering or another team leading (e.g. traceability data models,
+  microplanning changes, Labs embeds).
+- `Not Needed` — engineering can take it forward alone: platform, infrastructure, tech debt,
+  security, tooling, internal APIs with no product question (e.g. Celery queues, health
+  checks, Terraform, test automation).
+When it's between two, pick the one with more product involvement and say why. Field:
+`{"customfield_11029": {"value": "Inputs"}}`.
 
 ### Product Area values
 Use only existing values (check the current list from the open-CCC pull if unsure):
@@ -100,7 +126,8 @@ how many you skipped and why.
   stay. Goal 02 is spelled `Program integrity and tracability` in Jira. Cap at `--max` (40).
 - **Report** — lead with the outcome ("9 new CCC ideas: 3 pass, 6 need fixes, 11 changes
   proposed"). Then a table, one row per idea: linked key, summary, and ✓ / proposed value for
-  Priority · Goal · Description · Product Area. Then the drafted problem statements, then
+  Priority · Goal · Description · Product Area · Product Pod (`—` when not required). Then the
+  Product Pod sweep: older planned items missing it, one line each with the proposed value. Then the drafted problem statements, then
   **Flags** (duplicates, misfiled delivery work, principle conflicts, prioritization questions),
   then people to @-mention (comments post under Mary's token and don't notify anyone).
 - Every Jira key is a link: `[CCC-483](https://dimagi.atlassian.net/browse/CCC-483)`.
