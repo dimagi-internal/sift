@@ -53,3 +53,4 @@ key and op. Re-propose only if the ticket has materially changed since, and say 
 | 2026-11-04 | Mary Rocheleau | [CCC-292](https://dimagi.atlassian.net/browse/CCC-292) | Move status back to Backlog to match Prioritization = Backlog (do not flag the mismatch) | Leave as is |
 | 2026-11-04 | Mary Rocheleau | [CCC-464](https://dimagi.atlassian.net/browse/CCC-464) | Intake comment with a drafted problem statement (Celery schedules drift) | — |
 | 2026-11-04 | Mary Rocheleau | [CCC-470](https://dimagi.atlassian.net/browse/CCC-470) | Intake comment with a drafted problem statement (Sunset Superset) | — |
+| 2026-11-04 | Mary Rocheleau | [CCC-482](https://dimagi.atlassian.net/browse/CCC-482) | Link as Duplicate of [CCC-477](https://dimagi.atlassian.net/browse/CCC-477) (supervisor app data) | Leave it |
