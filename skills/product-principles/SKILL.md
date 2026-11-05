@@ -2,7 +2,8 @@
 name: product-principles
 description: >
   Read, apply and maintain the Connect Product Principles — the Confluence page of product
-  principles and decisions that have been made (payments, visits, FLW communication, support).
+  principles and decisions that have been made (payments, visits, FLW communication, support,
+  language).
   Use it to check roadmap items and tickets against settled decisions, and to draft and apply
   updates to the page once a human approves them. Triggers: "add a principle", "we decided
   X", "update the principles", "does this conflict with our principles", and any triage or
@@ -28,6 +29,8 @@ Reads are free. A page edit is a public write: it happens **only** through
   - paying on form submission conflicts with **Payments** (pay on approval)
   - FLWs claiming unfunded work conflicts with **Conducting visits**
   - a rejection with no FLW-readable reason conflicts with **Communicating with FLWs**
+  - American spellings in product copy ("color", "canceled") conflict with **Language and
+    Localization** (British English by default)
 - **Don't re-litigate.** A settled principle is not an open question. Don't propose
   alternatives to it unless the asker asks to revisit it.
 - **Goals vs. principles:** the 2027 goals (`context/2027-themes.md`) say what to work on. The

@@ -35,6 +35,7 @@ applying and updating the page all go through `skills/product-principles`.
   FLWs see how much paid work is left before doing it.
 - **Support:** fully self-service. No action requires contacting Dimagi, and there is no
   support team.
+- **Language:** the platform defaults to English, with British spellings (not American).
 
 ## Hard guardrail — reads free, writes gated
 Search/read run freely. **Every outbound action (sending on a channel, public writes) requires
