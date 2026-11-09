@@ -61,3 +61,6 @@ key and op. Re-propose only if the ticket has materially changed since, and say 
 | 2026-11-04 | Mary Rocheleau | [CCC-470](https://dimagi.atlassian.net/browse/CCC-470) | Intake comment with a drafted problem statement (Sunset Superset) | — |
 | 2026-11-04 | Mary Rocheleau | [CCC-482](https://dimagi.atlassian.net/browse/CCC-482) | Link as Duplicate of [CCC-477](https://dimagi.atlassian.net/browse/CCC-477) (supervisor app data) | Leave it |
 | 2026-11-04 | Mary Rocheleau | [CCC-108](https://dimagi.atlassian.net/browse/CCC-108) | Close as Won't Do, superseded by [CCC-299](https://dimagi.atlassian.net/browse/CCC-299) | Backwards: CCC-299 was merged into CCC-108, so CCC-108 is the keeper and stays open |
+| 2026-11-09 | Mary Rocheleau | [CCCT-3028](https://dimagi.atlassian.net/browse/CCCT-3028) | Comment asking David Viggiano to assign the In Progress slice | — |
+| 2026-11-09 | Mary Rocheleau | [CCCT-2936](https://dimagi.atlassian.net/browse/CCCT-2936) | Comment with drafted acceptance criteria (archive an organisation) | — |
+| 2026-11-09 | Mary Rocheleau | [CCCT-2972](https://dimagi.atlassian.net/browse/CCCT-2972) | Comment with drafted acceptance criteria (learn time in minutes) | — |
