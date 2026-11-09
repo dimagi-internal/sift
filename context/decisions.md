@@ -46,6 +46,7 @@ page (`skills/product-principles`). This file holds how *Sift* should triage, ra
 | 2026-11-04 | Mary Rocheleau | clean-the-backlog vs grooming prep | Remove what overlaps with grooming prep: clean-the-backlog skips tickets in the next sprint and reports no capacity. Renamed from backlog-triage to "clean the backlog". | `skills/clean-the-backlog` |
 | 2026-11-04 | Mary Rocheleau | CCC Product Pod | Product Pod (`customfield_11029`: Leads / Inputs / Not Needed) says how much input the product team must give to move an item forward. Every prioritized CCC item (Prioritization not `Backlog`) must have it. | `skills/roadmap-intake` |
 | 2026-11-04 | Mary Rocheleau | CCC intake comments | Drafted problem-statement comments are the statement alone: no "Proposed problem statement" header, no "Supports goal …" tag, no named follow-ups. Reviewed one at a time before posting. | `skills/roadmap-intake` |
+| 2026-11-09 | Mary Rocheleau | Terminology | "Roadmap" means the CCC project. A request about the roadmap (e.g. "review the roadmap backlog") is CCC work: `sift:roadmap-intake` / `sift:review-stale-tickets CCC`, not the CCCT sweep (`sift:clean-the-backlog`). Delivery backlog = CCCT. | `context/decisions.md` |
 
 ## Declined changes
 Specific proposals that were struck. Before proposing a change to a ticket, check here for that
