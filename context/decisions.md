@@ -47,6 +47,7 @@ page (`skills/product-principles`). This file holds how *Sift* should triage, ra
 | 2026-11-04 | Mary Rocheleau | CCC Product Pod | Product Pod (`customfield_11029`: Leads / Inputs / Not Needed) says how much input the product team must give to move an item forward. Every prioritized CCC item (Prioritization not `Backlog`) must have it. | `skills/roadmap-intake` |
 | 2026-11-04 | Mary Rocheleau | CCC intake comments | Drafted problem-statement comments are the statement alone: no "Proposed problem statement" header, no "Supports goal …" tag, no named follow-ups. Reviewed one at a time before posting. | `skills/roadmap-intake` |
 | 2026-11-09 | Mary Rocheleau | Terminology | "Roadmap" means the CCC project. A request about the roadmap (e.g. "review the roadmap backlog") is CCC work: `sift:roadmap-intake` / `sift:review-stale-tickets CCC`, not the CCCT sweep (`sift:clean-the-backlog`). Delivery backlog = CCCT. | `context/decisions.md` |
+| 2026-11-09 | Mary Rocheleau | CCCT stale review | "If things are in status backlog they aren't stale." A CCCT ticket in status `Backlog` is queued, however old: never close, nudge or flag it for age. The stale pull excludes it. | `skills/review-stale-tickets` |
 
 ## Declined changes
 Specific proposals that were struck. Before proposing a change to a ticket, check here for that

@@ -29,7 +29,9 @@ Nothing else — CI interrupts go through `sift:review-interrupt`. **Batch cap**
 - Read `context/2027-themes.md`. On CCC, a stuck item with a `Goal` gets a **nudge**, never a
   close — it's on a 2027 theme. Stale items with no Goal are the stronger close candidates.
 - Read `context/delivery-model.md`: "stuck" is judged against the snapshot's cycle time and the
-  CCCT flow, not age alone. An old Backlog ticket is queued, not stuck.
+  CCCT flow, not age alone.
+- **A CCCT ticket in status `Backlog` is never stale** (Mary, 2026-11-09): it's queued, however
+  old. The CCCT pull below excludes it, so don't close, nudge or flag one for age.
 - CCC items with `prioritization` = `Backlog` are parked on purpose: never nudge them as stale, and
   don't propose closing them just for age (context/delivery-model.md › Planned vs. not planned).
 - A stale item that conflicts with a Product Principle is a strong close/rework candidate —
@@ -46,6 +48,7 @@ bin/sift-jira search --max 500 --jql "project = $P AND statusCategory != Done \
   AND cf[10336] is EMPTY AND cf[10338] is EMPTY \
   AND NOT status CHANGED AFTER -${N}d AND created <= -${N}d ORDER BY updated ASC" > "$T/stuck.json"
 ```
+On CCCT, add `AND status != Backlog` (ruling 2026-11-09: Backlog tickets aren't stale).
 The `cf[10336]`/`cf[10338]` clauses drop archived CCC ideas (Mary, 2026-11-04); they are no-ops on CCCT.
 Repeat runs: `canopy cursor since review-stale-$P --local ~/.sift/state --items - < "$T/stuck.json"`.
 
@@ -71,7 +74,7 @@ confident about and say how many you skipped and why.
 ### CCCT — implementation
 | Situation | Disposition |
 |---|---|
-| Backlog/To Do/Open, unowned, no linked active CCC item, nothing in comments since | **close** → Won't Do, with a comment saying why and how to reopen |
+| To Do/Open (never `Backlog`), unowned, no linked active CCC item, nothing in comments since | **close** → Won't Do, with a comment saying why and how to reopen |
 | Its ask already shipped (merged PR, done sibling, a later epic covers it) | **nudge** the owner/reporter: "this looks done by X — close?" |
 | Product discovery parked in CCCT ("review…", "determine user stories…") | **close** with a comment pointing it to CCC as a roadmap item |
 | In Progress / In Review, stuck | **nudge** the assignee for status; **flag** if unassigned |
