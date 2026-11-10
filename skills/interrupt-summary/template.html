@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Connect Interrupt Summary</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&family=Fraunces:opsz,wght@9..144,600&display=swap">
+<style>
+/* Rendered by bin/sift-interrupt-summary render — edit the design here, the data comes from DATA below. */
+:root{
+  --bg:#f7f8fa; --surface:#ffffff; --fg:#14171c; --fg2:#4d5562; --muted:#7a828f; --rule:#dfe3e9; --grid:#eceff3;
+  --s1:#2a78d6; --s2:#eb6834; --s3:#1baf7a;
+  --display:"Fraunces",Georgia,serif; --body:"IBM Plex Sans",system-ui,sans-serif; --mono:"IBM Plex Mono",ui-monospace,monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#121417; --surface:#1a1d21; --fg:#eef0f3; --fg2:#b9c0ca; --muted:#8a929e; --rule:#2c3138; --grid:#252a30;
+  --s1:#3987e5; --s2:#d95926; --s3:#199e70; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#121417; --surface:#1a1d21; --fg:#eef0f3; --fg2:#b9c0ca; --muted:#8a929e; --rule:#2c3138; --grid:#252a30;
+  --s1:#3987e5; --s2:#d95926; --s3:#199e70; color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--body);font-size:15px;line-height:1.5}
+.wrap{max-width:860px;margin:0 auto;padding-block:36px 56px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:grid;gap:28px}
+h1{font-family:var(--display);font-weight:600;font-size:clamp(26px,4vw,34px);line-height:1.15;margin:0;text-wrap:balance}
+h2{font-family:var(--display);font-weight:600;font-size:20px;margin:0;text-wrap:balance}
+p{margin:0;max-width:68ch}
+.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.sub{color:var(--fg2);font-size:14px}
+.panel{background:var(--surface);border:1px solid var(--rule);border-radius:10px;padding:20px;display:grid;gap:12px;min-width:0}
+.legend{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:13px;color:var(--fg2)}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:6px;vertical-align:-1px}
+.chart{position:relative}
+.chart svg{display:block;width:100%;height:auto;overflow:visible}
+.chart text{font-family:var(--mono);font-size:11px;fill:var(--muted)}
+.chart .tot{fill:var(--fg);font-size:12px;font-weight:500}
+.tip{position:absolute;pointer-events:none;background:var(--surface);border:1px solid var(--rule);border-radius:6px;padding:8px 10px;font-size:12px;box-shadow:0 4px 14px rgba(0,0,0,.12);min-width:150px;z-index:2}
+.tip .row{display:flex;justify-content:space-between;gap:14px;font-variant-numeric:tabular-nums}
+.tip .hd{font-weight:600;margin-bottom:4px}
+.scroll{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:14px;font-variant-numeric:tabular-nums}
+th,td{padding:9px 8px;text-align:left;vertical-align:top;border-bottom:1px solid var(--grid)}
+thead th{font-family:var(--mono);font-weight:500;font-size:11px;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--rule)}
+td.n{font-family:var(--mono);text-align:right;white-space:nowrap;width:1%}
+td.cat{font-weight:500;white-space:nowrap}
+.bar{height:6px;border-radius:0 3px 3px 0;margin-top:6px}
+td.what{color:var(--fg2);min-width:240px}
+.foot{font-size:12px;color:var(--muted)}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header style="display:grid;gap:10px">
+    <div class="eyebrow" id="eyebrow"></div>
+    <h1 id="title"></h1>
+    <p class="sub" id="headline"></p>
+  </header>
+
+  <section class="panel" aria-labelledby="m-h">
+    <h2 id="m-h">Requests per month</h2>
+    <div class="legend" id="legend"></div>
+    <div class="chart" id="chart"><div class="tip" id="tip" hidden></div></div>
+    <p class="sub" id="partial"></p>
+  </section>
+
+  <section class="panel" aria-labelledby="t-h">
+    <h2 id="t-h">Task categories</h2>
+    <p class="sub" id="tasks-note"></p>
+    <div class="scroll"><table id="tasks"></table></div>
+  </section>
+
+  <section class="panel" aria-labelledby="b-h">
+    <h2 id="b-h">Bug categories</h2>
+    <p class="sub" id="bugs-note"></p>
+    <div class="scroll"><table id="bugs"></table></div>
+  </section>
+
+  <section class="panel" aria-labelledby="s-h">
+    <h2 id="s-h">Story themes</h2>
+    <p class="sub" id="stories-note"></p>
+    <div class="scroll"><table id="stories"></table></div>
+  </section>
+
+  <p class="foot" id="foot"></p>
+</div>
+
+<script>
+const DATA=/*__DATA__*/null;
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const txt=(id,s)=>{const e=document.getElementById(id);e.textContent=s||'';e.hidden=!s};
+txt('title',DATA.title);txt('eyebrow',DATA.eyebrow);txt('headline',DATA.headline);txt('partial',DATA.partial_note);txt('foot',DATA.foot);
+txt('tasks-note',DATA.tasks.note);txt('bugs-note',DATA.bugs.note);txt('stories-note',DATA.stories.note);
+
+const MLAB=DATA.months, M=DATA.series, N=MLAB.length;
+const K=[{k:'Task',c:'--s1'},{k:'Bug',c:'--s2'},{k:'Story',c:'--s3'}];
+const css=v=>getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+const NS='http://www.w3.org/2000/svg';
+const el=(t,a={},p)=>{const e=document.createElementNS(NS,t);for(const k in a)e.setAttribute(k,a[k]);p&&p.appendChild(e);return e};
+document.getElementById('legend').innerHTML=K.map(k=>`<span><i style="background:var(${k.c})"></i>${k.k}</span>`).join('');
+function draw(){
+  const host=document.getElementById('chart'),tip=document.getElementById('tip');
+  host.querySelectorAll('svg').forEach(s=>s.remove());
+  const tot=MLAB.map((_,i)=>K.reduce((s,k)=>s+M[k.k][i],0));
+  const step=25,max=Math.max(step,Math.ceil(Math.max(...tot)/step)*step);
+  const W=800,H=280,m={t:22,r:6,b:32,l:32},iw=W-m.l-m.r,ih=H-m.t-m.b,y=v=>m.t+ih-v/max*ih,bw=iw/N,w=Math.min(56,bw*.56);
+  const svg=el('svg',{viewBox:`0 0 ${W} ${H}`,role:'img','aria-label':'CI tickets per month: '+tot.map((t,i)=>MLAB[i]+' '+t).join(', ')});
+  for(let v=0;v<=max;v+=step){el('line',{x1:m.l,x2:W-m.r,y1:y(v),y2:y(v),stroke:css('--grid')},svg);el('text',{x:m.l-8,y:y(v)+4,'text-anchor':'end'},svg).textContent=v}
+  tot.forEach((t,i)=>{const cx=m.l+bw*i+bw/2,x=cx-w/2;let acc=0;const g=el('g',{},svg);
+    K.forEach(k=>{const v=M[k.k][i];if(!v)return;const y0=y(acc),y1=y(acc+v);acc+=v;const top=acc===t,h=Math.max(0,y0-y1-(top?0:2));
+      if(top){const r=Math.min(4,h);el('path',{d:`M${x},${y0} V${y1+r} Q${x},${y1} ${x+r},${y1} H${x+w-r} Q${x+w},${y1} ${x+w},${y1+r} V${y0} Z`,fill:css(k.c)},g)}
+      else el('rect',{x,y:y0-h,width:w,height:h,fill:css(k.c)},g)});
+    el('text',{x:cx,y:y(t)-7,'text-anchor':'middle',class:'tot'},svg).textContent=t;
+    el('text',{x:cx,y:H-m.b+18,'text-anchor':'middle'},svg).textContent=MLAB[i];
+    const hit=el('rect',{x:m.l+bw*i,y:m.t,width:bw,height:ih,fill:'transparent',tabindex:0},svg);
+    const show=()=>{tip.innerHTML=`<div class="hd">${esc(MLAB[i])} · ${t}</div>`+K.slice().reverse().map(k=>`<div class="row"><span><span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:var(${k.c});margin-right:6px"></span>${k.k}</span><b>${M[k.k][i]}</b></div>`).join('');
+      tip.hidden=false;const r=host.getBoundingClientRect(),sx=r.width/W;let left=(cx+w/2+10)*sx;if(left+170>r.width)left=(cx-w/2-10)*sx-tip.offsetWidth;tip.style.left=Math.max(0,left)+'px';tip.style.top=(y(t)*sx)+'px';svg.querySelectorAll('g').forEach(o=>o.style.opacity=o===g?1:.45)};
+    const hide=()=>{tip.hidden=true;svg.querySelectorAll('g').forEach(o=>o.style.opacity=1)};
+    hit.addEventListener('mouseenter',show);hit.addEventListener('focus',show);hit.addEventListener('mouseleave',hide);hit.addEventListener('blur',hide)});
+  host.appendChild(svg)}
+draw();
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change',draw);
+new MutationObserver(draw).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
+
+const table=(id,sec,unit,color,h3,h4)=>{const rows=sec.rows,max=Math.max(1,...rows.map(r=>r[1]));
+ document.getElementById(id).innerHTML=`<thead><tr><th>Category</th><th style="text-align:right">${unit}</th><th>${h3}</th><th>${h4}</th></tr></thead><tbody>`+
+ rows.map(([c,n,w,f])=>`<tr><td class="cat">${esc(c)}<div class="bar" style="width:${n/max*100}%;background:var(${color})"></div></td><td class="n">${n} <span style="color:var(--muted)">${Math.round(n/Math.max(1,sec.total)*100)}%</span></td><td class="what">${esc(w)}</td><td class="what">${esc(f)}</td></tr>`).join('')+'</tbody>'};
+table('tasks',DATA.tasks,'Tasks','--s1','What they are','Product change');
+table('bugs',DATA.bugs,'Bugs','--s2','What they are','Product change');
+table('stories',DATA.stories,'Stories','--s3','What they ask for','Status');
+</script>
+</body>
+</html>
