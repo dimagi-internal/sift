@@ -255,7 +255,7 @@ def _table(sec, unit, color, h3, h4):
                 f'<td class="what">{_e(r[2])}</td><td class="what">{_e(r[3])}</td></tr>')
     if rows and len(rows[0]) > 4:  # Task rows carry an aim: group them, Address first
         body = ""
-        for aim, label, bar in (("address", "Address through product work or tooling", "--muted"),
+        for aim, label, bar in (("address", "Address through product work or tooling", color),
                                 ("keep", "OK to keep as interrupts", "--muted")):
             grp = [r for r in rows if r[4] == aim]
             if grp:
