@@ -7,7 +7,7 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&family=Fraunces:opsz,wght@9..144,600&display=swap">
 <style>
-/* Rendered by bin/sift-interrupt-summary render — edit the design here, the data comes from DATA below. */
+/* Filled by bin/sift-interrupt-summary render. All content is static HTML/SVG filled into the double-brace slots; the script only adds hover tooltips. */
 :root{
   --bg:#f7f8fa; --surface:#ffffff; --fg:#14171c; --fg2:#4d5562; --muted:#7a828f; --rule:#dfe3e9; --grid:#eceff3;
   --s1:#2a78d6; --s2:#eb6834; --s3:#1baf7a;
@@ -45,6 +45,10 @@ thead th{font-family:var(--mono);font-weight:500;font-size:11px;letter-spacing:.
 td.n{font-family:var(--mono);text-align:right;white-space:nowrap;width:1%}
 td.cat{font-weight:500;white-space:nowrap}
 .bar{height:6px;border-radius:0 3px 3px 0;margin-top:6px}
+.pct{color:var(--muted)}
+.chart g.m{outline:none}
+.chart.hov g.m{opacity:.45}
+.chart.hov g.m.on{opacity:1}
 td.what{color:var(--fg2);min-width:240px}
 .foot{font-size:12px;color:var(--muted)}
 [hidden]{display:none!important}
@@ -53,82 +57,50 @@ td.what{color:var(--fg2);min-width:240px}
 <body>
 <div class="wrap">
   <header style="display:grid;gap:10px">
-    <div class="eyebrow" id="eyebrow"></div>
-    <h1 id="title"></h1>
-    <p class="sub" id="headline"></p>
+    <div class="eyebrow">{{EYEBROW}}</div>
+    <h1>{{TITLE}}</h1>
+    {{HEADLINE}}
   </header>
 
   <section class="panel" aria-labelledby="m-h">
     <h2 id="m-h">Requests per month</h2>
-    <div class="legend" id="legend"></div>
-    <div class="chart" id="chart"><div class="tip" id="tip" hidden></div></div>
-    <p class="sub" id="partial"></p>
+    <div class="legend">{{LEGEND}}</div>
+    <div class="chart" id="chart">{{CHART}}<div class="tip" id="tip" hidden></div></div>
+    {{PARTIAL}}
   </section>
 
   <section class="panel" aria-labelledby="t-h">
     <h2 id="t-h">Task categories</h2>
-    <p class="sub" id="tasks-note"></p>
-    <div class="scroll"><table id="tasks"></table></div>
+    {{TASKS_NOTE}}
+    <div class="scroll"><table>{{TASKS}}</table></div>
   </section>
 
   <section class="panel" aria-labelledby="b-h">
     <h2 id="b-h">Bug categories</h2>
-    <p class="sub" id="bugs-note"></p>
-    <div class="scroll"><table id="bugs"></table></div>
+    {{BUGS_NOTE}}
+    <div class="scroll"><table>{{BUGS}}</table></div>
   </section>
 
   <section class="panel" aria-labelledby="s-h">
     <h2 id="s-h">Story themes</h2>
-    <p class="sub" id="stories-note"></p>
-    <div class="scroll"><table id="stories"></table></div>
+    {{STORIES_NOTE}}
+    <div class="scroll"><table>{{STORIES}}</table></div>
   </section>
 
-  <p class="foot" id="foot"></p>
+  {{FOOT}}
 </div>
 
 <script>
-const DATA=/*__DATA__*/null;
-const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const txt=(id,s)=>{const e=document.getElementById(id);e.textContent=s||'';e.hidden=!s};
-txt('title',DATA.title);txt('eyebrow',DATA.eyebrow);txt('headline',DATA.headline);txt('partial',DATA.partial_note);txt('foot',DATA.foot);
-txt('tasks-note',DATA.tasks.note);txt('bugs-note',DATA.bugs.note);txt('stories-note',DATA.stories.note);
-
-const MLAB=DATA.months, M=DATA.series, N=MLAB.length;
-const K=[{k:'Task',c:'--s1'},{k:'Bug',c:'--s2'},{k:'Story',c:'--s3'}];
-const css=v=>getComputedStyle(document.documentElement).getPropertyValue(v).trim();
-const NS='http://www.w3.org/2000/svg';
-const el=(t,a={},p)=>{const e=document.createElementNS(NS,t);for(const k in a)e.setAttribute(k,a[k]);p&&p.appendChild(e);return e};
-document.getElementById('legend').innerHTML=K.map(k=>`<span><i style="background:var(${k.c})"></i>${k.k}</span>`).join('');
-function draw(){
-  const host=document.getElementById('chart'),tip=document.getElementById('tip');
-  host.querySelectorAll('svg').forEach(s=>s.remove());
-  const tot=MLAB.map((_,i)=>K.reduce((s,k)=>s+M[k.k][i],0));
-  const step=25,max=Math.max(step,Math.ceil(Math.max(...tot)/step)*step);
-  const W=800,H=280,m={t:22,r:6,b:32,l:32},iw=W-m.l-m.r,ih=H-m.t-m.b,y=v=>m.t+ih-v/max*ih,bw=iw/N,w=Math.min(56,bw*.56);
-  const svg=el('svg',{viewBox:`0 0 ${W} ${H}`,role:'img','aria-label':'CI tickets per month: '+tot.map((t,i)=>MLAB[i]+' '+t).join(', ')});
-  for(let v=0;v<=max;v+=step){el('line',{x1:m.l,x2:W-m.r,y1:y(v),y2:y(v),stroke:css('--grid')},svg);el('text',{x:m.l-8,y:y(v)+4,'text-anchor':'end'},svg).textContent=v}
-  tot.forEach((t,i)=>{const cx=m.l+bw*i+bw/2,x=cx-w/2;let acc=0;const g=el('g',{},svg);
-    K.forEach(k=>{const v=M[k.k][i];if(!v)return;const y0=y(acc),y1=y(acc+v);acc+=v;const top=acc===t,h=Math.max(0,y0-y1-(top?0:2));
-      if(top){const r=Math.min(4,h);el('path',{d:`M${x},${y0} V${y1+r} Q${x},${y1} ${x+r},${y1} H${x+w-r} Q${x+w},${y1} ${x+w},${y1+r} V${y0} Z`,fill:css(k.c)},g)}
-      else el('rect',{x,y:y0-h,width:w,height:h,fill:css(k.c)},g)});
-    el('text',{x:cx,y:y(t)-7,'text-anchor':'middle',class:'tot'},svg).textContent=t;
-    el('text',{x:cx,y:H-m.b+18,'text-anchor':'middle'},svg).textContent=MLAB[i];
-    const hit=el('rect',{x:m.l+bw*i,y:m.t,width:bw,height:ih,fill:'transparent',tabindex:0},svg);
-    const show=()=>{tip.innerHTML=`<div class="hd">${esc(MLAB[i])} · ${t}</div>`+K.slice().reverse().map(k=>`<div class="row"><span><span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:var(${k.c});margin-right:6px"></span>${k.k}</span><b>${M[k.k][i]}</b></div>`).join('');
-      tip.hidden=false;const r=host.getBoundingClientRect(),sx=r.width/W;let left=(cx+w/2+10)*sx;if(left+170>r.width)left=(cx-w/2-10)*sx-tip.offsetWidth;tip.style.left=Math.max(0,left)+'px';tip.style.top=(y(t)*sx)+'px';svg.querySelectorAll('g').forEach(o=>o.style.opacity=o===g?1:.45)};
-    const hide=()=>{tip.hidden=true;svg.querySelectorAll('g').forEach(o=>o.style.opacity=1)};
-    hit.addEventListener('mouseenter',show);hit.addEventListener('focus',show);hit.addEventListener('mouseleave',hide);hit.addEventListener('blur',hide)});
-  host.appendChild(svg)}
-draw();
-matchMedia('(prefers-color-scheme: dark)').addEventListener('change',draw);
-new MutationObserver(draw).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
-
-const table=(id,sec,unit,color,h3,h4)=>{const rows=sec.rows,max=Math.max(1,...rows.map(r=>r[1]));
- document.getElementById(id).innerHTML=`<thead><tr><th>Category</th><th style="text-align:right">${unit}</th><th>${h3}</th><th>${h4}</th></tr></thead><tbody>`+
- rows.map(([c,n,w,f])=>`<tr><td class="cat">${esc(c)}<div class="bar" style="width:${n/max*100}%;background:var(${color})"></div></td><td class="n">${n} <span style="color:var(--muted)">${Math.round(n/Math.max(1,sec.total)*100)}%</span></td><td class="what">${esc(w)}</td><td class="what">${esc(f)}</td></tr>`).join('')+'</tbody>'};
-table('tasks',DATA.tasks,'Tasks','--s1','What they are','Product change');
-table('bugs',DATA.bugs,'Bugs','--s2','What they are','Product change');
-table('stories',DATA.stories,'Stories','--s3','What they ask for','Status');
+// Optional enhancement: hover/focus tooltips on the chart. The page is complete without it.
+(()=>{const host=document.getElementById('chart'),tip=document.getElementById('tip'),svg=host.querySelector('svg');if(!svg)return;
+const esc=s=>s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+host.querySelectorAll('g.m').forEach(g=>{
+  const show=()=>{tip.innerHTML='<div class="hd">'+esc(g.dataset.h)+'</div>'+g.dataset.t.split(' · ').map(x=>{const i=x.lastIndexOf(' ');return '<div class="row"><span>'+esc(x.slice(0,i))+'</span><b>'+esc(x.slice(i+1))+'</b></div>'}).join('');
+    tip.hidden=false;const r=host.getBoundingClientRect(),b=g.querySelector('path,rect:not([fill=transparent])')||g.firstChild,bb=b.getBoundingClientRect();
+    let left=bb.right-r.left+10;if(left+170>r.width)left=bb.left-r.left-10-tip.offsetWidth;tip.style.left=Math.max(0,left)+'px';tip.style.top=(bb.top-r.top)+'px';
+    host.classList.add('hov');g.classList.add('on')};
+  const hide=()=>{tip.hidden=true;host.classList.remove('hov');g.classList.remove('on')};
+  g.addEventListener('mouseenter',show);g.addEventListener('focus',show);g.addEventListener('mouseleave',hide);g.addEventListener('blur',hide)})})();
 </script>
 </body>
 </html>

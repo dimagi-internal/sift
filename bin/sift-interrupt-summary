@@ -28,6 +28,7 @@ State: ~/.sift/state/interrupt-summary/{assign.json, last-run, stats-<to>.json}.
 import argparse
 import calendar
 import datetime as dt
+import html
 import json
 import os
 import re
@@ -184,6 +185,95 @@ def _rows(ty, tax, s, overrides):
     return sorted(rows, key=lambda r: -r[1])
 
 
+SERIES = (("Task", "--s1"), ("Bug", "--s2"), ("Story", "--s3"))
+
+
+def _e(x):
+    return html.escape(str(x), quote=True)
+
+
+def _chart(labels, series):
+    """Static stacked-bar SVG. Colours are CSS variables, so it follows light/dark with no script."""
+    n = len(labels)
+    tot = [sum(series[k][i] for k, _ in SERIES) for i in range(n)]
+    step = 25
+    top = max(step, -(-max(tot or [0]) // step) * step)
+    W, H, mt, mr, mb, ml = 800, 280, 22, 6, 32, 32
+    iw, ih = W - ml - mr, H - mt - mb
+    y = lambda v: mt + ih - v / top * ih
+    bw = iw / max(n, 1)
+    w = min(56, bw * .56)
+    aria = "CI tickets per month: " + ", ".join(f"{l} {t}" for l, t in zip(labels, tot))
+    out = [f'<svg viewBox="0 0 {W} {H}" role="img" aria-label="{_e(aria)}">']
+    for v in range(0, top + 1, step):
+        out.append(f'<line x1="{ml}" x2="{W - mr}" y1="{y(v):.1f}" y2="{y(v):.1f}" style="stroke:var(--grid)"/>'
+                   f'<text x="{ml - 8}" y="{y(v) + 4:.1f}" text-anchor="end">{v}</text>')
+    for i, (lab, t) in enumerate(zip(labels, tot)):
+        cx = ml + bw * i + bw / 2
+        x = cx - w / 2
+        tip = " · ".join(f"{k} {series[k][i]}" for k, _ in reversed(SERIES))
+        g = [f'<g class="m" tabindex="0" data-h="{_e(lab)} · {t}" data-t="{_e(tip)}">',
+             f'<rect x="{ml + bw * i:.1f}" y="{mt}" width="{bw:.1f}" height="{ih}" fill="transparent"/>']
+        acc = 0
+        for k, c in SERIES:
+            v = series[k][i]
+            if not v:
+                continue
+            y0, y1 = y(acc), y(acc + v)
+            acc += v
+            last = acc == t
+            h = max(0, y0 - y1 - (0 if last else 2))
+            if last:
+                r = min(4, h)
+                g.append(f'<path d="M{x:.1f},{y0:.1f} V{y1 + r:.1f} Q{x:.1f},{y1:.1f} {x + r:.1f},{y1:.1f} '
+                         f'H{x + w - r:.1f} Q{x + w:.1f},{y1:.1f} {x + w:.1f},{y1 + r:.1f} V{y0:.1f} Z" style="fill:var({c})"/>')
+            else:
+                g.append(f'<rect x="{x:.1f}" y="{y0 - h:.1f}" width="{w:.1f}" height="{h:.1f}" style="fill:var({c})"/>')
+        g.append(f'<text x="{cx:.1f}" y="{y(t) - 7:.1f}" text-anchor="middle" class="tot">{t}</text>'
+                 f'<text x="{cx:.1f}" y="{H - mb + 18}" text-anchor="middle">{_e(lab)}</text></g>')
+        out.append("".join(g))
+    out.append("</svg>")
+    return "".join(out)
+
+
+def _table(sec, unit, color, h3, h4):
+    rows = sec["rows"]
+    mx = max([r[1] for r in rows] + [1])
+    body = "".join(
+        f'<tr><td class="cat">{_e(c)}<div class="bar" style="width:{n / mx * 100:.1f}%;background:var({color})"></div></td>'
+        f'<td class="n">{n} <span class="pct">{round(n / max(1, sec["total"]) * 100)}%</span></td>'
+        f'<td class="what">{_e(w)}</td><td class="what">{_e(f)}</td></tr>' for c, n, w, f in rows)
+    return (f'<thead><tr><th>Category</th><th style="text-align:right">{unit}</th><th>{h3}</th><th>{h4}</th></tr></thead>'
+            f"<tbody>{body}</tbody>")
+
+
+def _p(text, cls="sub"):
+    return f'<p class="{cls}">{_e(text)}</p>' if text else ""
+
+
+def _html(page):
+    """Fill the template with fully static content — the page must read correctly with scripts off."""
+    with open(os.path.join(SKILL, "template.html")) as f:
+        tpl = f.read()
+    legend = "".join(f'<span><i style="background:var({c})"></i>{k}</span>' for k, c in SERIES)
+    fills = {
+        "TITLE": _e(page["title"]), "EYEBROW": _e(page["eyebrow"]), "HEADLINE": _p(page["headline"]),
+        "LEGEND": legend, "CHART": _chart(page["months"], page["series"]),
+        "PARTIAL": _p(page["partial_note"]), "FOOT": _p(page["foot"], "foot"),
+        "TASKS_NOTE": _p(page["tasks"]["note"]), "BUGS_NOTE": _p(page["bugs"]["note"]),
+        "STORIES_NOTE": _p(page["stories"]["note"]),
+        "TASKS": _table(page["tasks"], "Tasks", "--s1", "What they are", "Product change"),
+        "BUGS": _table(page["bugs"], "Bugs", "--s2", "What they are", "Product change"),
+        "STORIES": _table(page["stories"], "Stories", "--s3", "What they ask for", "Status"),
+    }
+    for k, v in fills.items():
+        tpl = tpl.replace("{{" + k + "}}", v)
+    left = re.findall(r"\{\{[A-Z_]+\}\}", tpl)
+    if left:
+        sys.exit(f"template placeholders not filled: {left}")
+    return tpl
+
+
 def cmd_render(a):
     data, assign, tax = _load(a.tickets), _load(a.assign), _taxonomy()
     notes = _load(a.notes) if a.notes else {}
@@ -223,11 +313,8 @@ def cmd_render(a):
                     "rows": _rows("Story", tax, s, notes.get("overrides", {}))},
         "foot": foot,
     }
-    with open(os.path.join(SKILL, "template.html")) as f:
-        tpl = f.read()
-    blob = json.dumps(page, ensure_ascii=False).replace("</", "<\\/")
     with open(a.o, "w") as f:
-        f.write(tpl.replace("/*__DATA__*/null", blob))
+        f.write(_html(page))
     _dump(s, os.path.join(os.path.dirname(os.path.abspath(a.o)), "stats.json"))
     print(f"wrote {a.o}")
     print(headline)

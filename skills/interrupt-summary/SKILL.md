@@ -76,8 +76,9 @@ only the judgment, in `$D/notes.json`, using numbers from that printout:
 Re-run `render` with `--notes "$D/notes.json"`.
 
 ## 5. Check the page before showing it
-Open `$D/interrupt-summary.html` in a browser (or headless Chromium screenshot) and look at it:
-chart bars and totals present, three tables filled, no "undefined", partial months labelled.
+Open `$D/interrupt-summary.html` and look at it: chart bars and totals present, three tables
+filled, partial months labelled. All content is static HTML/SVG (the script only adds chart
+tooltips), so it must also read correctly with scripts off — file previews show it that way.
 
 ## 6. Present for approval
 Turn reply (turn Step 2):
