@@ -21,7 +21,7 @@ Usage (DIR = a scratch dir for this run):
 
 notes.json (Sift-written, all optional):
   {"headline_note": "...", "bugs_note": "...", "stories_note": "...",
-   "overrides": {"Task": {"<category>": {"what": "...", "change": "..."}}}}
+   "overrides": {"Task": {"<category>": {"what": "...", "change": "...", "aim": "address|keep"}}}}
 
 State: ~/.sift/state/interrupt-summary/{assign.json, last-run, stats-<to>.json}.
 """
@@ -181,8 +181,18 @@ def _rows(ty, tax, s, overrides):
             continue
         o = overrides.get(ty, {}).get(c["name"], {})
         last = _story_status(s["categories"][ty][c["name"]]) if ty == "Story" else o.get("change", c["change"])
-        rows.append([c["name"], n, o.get("what", c["what"]), last])
-    return sorted(rows, key=lambda r: -r[1])
+        row = [c["name"], n, o.get("what", c["what"]), last]
+        if ty == "Task":
+            aim = o.get("aim", c.get("aim"))
+            if aim not in AIMS:
+                sys.exit(f'taxonomy: Task category "{c["name"]}" needs "aim": "address" or "keep" (got {aim!r})')
+            row.append(aim)
+        rows.append(row)
+    # Tasks: the ones to address first, so the page reads "what to fix, then what we keep".
+    return sorted(rows, key=lambda r: (r[4] != "address" if ty == "Task" else 0, -r[1]))
+
+
+AIMS = {"address": "Address", "keep": "Keep"}
 
 
 SERIES = (("Task", "--s1"), ("Bug", "--s2"), ("Story", "--s3"))
@@ -239,10 +249,12 @@ def _chart(labels, series):
 def _table(sec, unit, color, h3, h4):
     rows = sec["rows"]
     mx = max([r[1] for r in rows] + [1])
+    def tag(r):
+        return f' <span class="aim {r[4]}">{AIMS[r[4]]}</span>' if len(r) > 4 else ""
     body = "".join(
-        f'<tr><td class="cat">{_e(c)}<div class="bar" style="width:{n / mx * 100:.1f}%;background:var({color})"></div></td>'
-        f'<td class="n">{n} <span class="pct">{round(n / max(1, sec["total"]) * 100)}%</span></td>'
-        f'<td class="what">{_e(w)}</td><td class="what">{_e(f)}</td></tr>' for c, n, w, f in rows)
+        f'<tr><td class="cat">{_e(r[0])}{tag(r)}<div class="bar" style="width:{r[1] / mx * 100:.1f}%;background:var({color})"></div></td>'
+        f'<td class="n">{r[1]} <span class="pct">{round(r[1] / max(1, sec["total"]) * 100)}%</span></td>'
+        f'<td class="what">{_e(r[2])}</td><td class="what">{_e(r[3])}</td></tr>' for r in rows)
     return (f'<thead><tr><th>Category</th><th style="text-align:right">{unit}</th><th>{h3}</th><th>{h4}</th></tr></thead>'
             f"<tbody>{body}</tbody>")
 
@@ -292,6 +304,11 @@ def cmd_render(a):
     partial = [f"{m['full']} covers {m['span']}" for m in s["months"] if m["partial"]]
     ss = s["story_status"]
     story_line = (f"{T['Story']} stories: {ss['done']} done, {ss['open']} open, {ss['wont']} closed Won't Do.")
+    task_rows = _rows("Task", tax, s, notes.get("overrides", {}))
+    addr = sum(r[1] for r in task_rows if r[4] == "address")
+    aim_line = (f"{addr} of {T['Task']} tasks ({round(addr / max(1, T['Task']) * 100)}%) are work to address: "
+                f"take it off the board through product work or other tooling. "
+                f"The other {T['Task'] - addr} are work we're OK keeping as interrupts.")
     folded = s["folded_into_task"]
     foot = ("Source: Jira project CI via Sift (bin/sift-jira). "
             + (f"Offboarding and sub-task tickets ({folded}) count as tasks. " if folded else "")
@@ -305,8 +322,8 @@ def cmd_render(a):
         "partial_note": ("; ".join(partial) + ".") if partial else "",
         "months": [m["label"] for m in s["months"]],
         "series": s["series"],
-        "tasks": {"total": T["Task"], "note": notes.get("tasks_note", ""),
-                  "rows": _rows("Task", tax, s, notes.get("overrides", {}))},
+        "tasks": {"total": T["Task"], "note": " ".join(x for x in (aim_line, notes.get("tasks_note", "")) if x),
+                  "rows": task_rows},
         "bugs": {"total": T["Bug"], "note": " ".join(x for x in (f"{T['Bug']} bugs.", notes.get("bugs_note", "")) if x),
                  "rows": _rows("Bug", tax, s, notes.get("overrides", {}))},
         "stories": {"total": T["Story"], "note": " ".join(x for x in (story_line, notes.get("stories_note", "")) if x),
@@ -324,7 +341,8 @@ def cmd_render(a):
     for ty in TYPES:
         print(f"== {ty} ({T[ty]})")
         for r in _rows(ty, tax, s, {}):
-            print(f"  {r[1]:4d}  {r[0]}" + (f"  [{r[3]}]" if ty == "Story" else ""))
+            print(f"  {r[1]:4d}  {r[0]}" + (f"  [{r[3]}]" if ty == "Story" else f"  [{r[4]}]" if ty == "Task" else ""))
+    print(aim_line)
     print(story_line)
 
 

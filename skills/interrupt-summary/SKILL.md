@@ -69,6 +69,11 @@ only the judgment, in `$D/notes.json`, using numbers from that printout:
  "overrides": {"Task": {"Feature flags & opp config": {"change": "…"}}}}
 ```
 - One or two sentences each, plain words, British spelling, no Jira jargon.
+- **Task aim.** Every Task category is tagged **Address** (work we want off the board through
+  product work or other tooling) or **Keep** (work we're OK handling as interrupts) — the
+  `aim` field in `taxonomy.json`. The page lists Address rows first and computes the "N of M
+  tasks are work to address" line. Flag it if a category's `change` text doesn't fit its tag
+  (e.g. Address with "no new action"); change an `aim` only on the approver's say-so.
 - `what` / `change` text lives in `taxonomy.json`. Update a cell when the facts moved — a
   proposed product change has shipped or been rejected, or the mix inside a category changed.
   Use `overrides` for this run only; edit `taxonomy.json` when it should stick (commit it).
