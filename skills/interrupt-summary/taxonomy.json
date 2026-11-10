@@ -13,7 +13,7 @@
     {"name": "Access requests", "aim": "address", "match": "access|permission|superset password|super ?user|github|repo(sitory)?\\b|add .* to .*report|add users to",
      "what": "Connect roles, Superset, GitHub/Labs, Django admin and superuser access.",
      "change": "Org admins manage roles; IT for tools"},
-    {"name": "Manual data fixes", "aim": "address", "match": "over ?limit visits|visit status|remove test user|data cleaning|post-assessment score",
+    {"name": "Manual data fixes", "aim": "keep", "match": "over ?limit visits|visit status|remove test user|data cleaning|post-assessment score",
      "what": "Approving over-limit visits, changing visit status, removing test users.",
      "change": "PM edits with an audit trail"},
     {"name": "Infra & stability", "aim": "keep", "match": "celery|rds|504|redis|response time|ec2|deploy failure|restart",

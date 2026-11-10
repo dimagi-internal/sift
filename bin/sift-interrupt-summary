@@ -249,12 +249,21 @@ def _chart(labels, series):
 def _table(sec, unit, color, h3, h4):
     rows = sec["rows"]
     mx = max([r[1] for r in rows] + [1])
-    def tag(r):
-        return f' <span class="aim {r[4]}">{AIMS[r[4]]}</span>' if len(r) > 4 else ""
-    body = "".join(
-        f'<tr><td class="cat">{_e(r[0])}{tag(r)}<div class="bar" style="width:{r[1] / mx * 100:.1f}%;background:var({color})"></div></td>'
-        f'<td class="n">{r[1]} <span class="pct">{round(r[1] / max(1, sec["total"]) * 100)}%</span></td>'
-        f'<td class="what">{_e(r[2])}</td><td class="what">{_e(r[3])}</td></tr>' for r in rows)
+    def row(r, bar):
+        return (f'<tr><td class="cat">{_e(r[0])}<div class="bar" style="width:{r[1] / mx * 100:.1f}%;background:var({bar})"></div></td>'
+                f'<td class="n">{r[1]} <span class="pct">{round(r[1] / max(1, sec["total"]) * 100)}%</span></td>'
+                f'<td class="what">{_e(r[2])}</td><td class="what">{_e(r[3])}</td></tr>')
+    if rows and len(rows[0]) > 4:  # Task rows carry an aim: group them, Address first
+        body = ""
+        for aim, label, bar in (("address", "Address through product work or tooling", "--muted"),
+                                ("keep", "OK to keep as interrupts", "--muted")):
+            grp = [r for r in rows if r[4] == aim]
+            if grp:
+                body += (f'<tr class="grp"><th colspan="4">{label}'
+                         f'<span class="grp-n">{sum(r[1] for r in grp)} tasks</span></th></tr>'
+                         + "".join(row(r, bar) for r in grp))
+    else:
+        body = "".join(row(r, color) for r in rows)
     return (f'<thead><tr><th>Category</th><th style="text-align:right">{unit}</th><th>{h3}</th><th>{h4}</th></tr></thead>'
             f"<tbody>{body}</tbody>")
 
