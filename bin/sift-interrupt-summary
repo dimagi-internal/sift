@@ -1,0 +1,280 @@
+#!/usr/bin/env python3
+"""CI interrupt summary — the data + render half of skills/interrupt-summary. Read-only.
+
+Builds the "Connect interrupts" page: tickets per month by type (Task / Bug / Story) and a
+category table per type. Jira is only read (via bin/sift-jira search); nothing is published
+here — the skill publishes the HTML after a human approves it.
+
+Usage (DIR = a scratch dir for this run):
+  bin/sift-interrupt-summary fetch --from 2026-05-10 --to 2026-11-10 -o DIR/tickets.json
+      CI tickets CREATED in [from, to] (inclusive). Default window: the 6 months to today.
+  bin/sift-interrupt-summary classify DIR/tickets.json -o DIR/assign.json
+      Pre-assign each ticket a category: last run's assignment first (state), then the first
+      taxonomy rule whose regex hits the title, else the type's catch-all ("by": "fallback").
+      Prints counts and every fallback ticket for the manual pass. Edit assign.json by hand.
+  bin/sift-interrupt-summary render DIR/tickets.json DIR/assign.json [--notes DIR/notes.json] -o DIR/interrupt-summary.html
+      Validates (every ticket assigned to a known category of its type), computes all numbers,
+      fills skills/interrupt-summary/template.html, and writes DIR/stats.json beside the HTML.
+  bin/sift-interrupt-summary save DIR
+      After the page is published: merge assign.json into the carried-over assignments,
+      snapshot stats.json, and stamp the last-run date (the monthly schedule reads it).
+
+notes.json (Sift-written, all optional):
+  {"headline_note": "...", "bugs_note": "...", "stories_note": "...",
+   "overrides": {"Task": {"<category>": {"what": "...", "change": "..."}}}}
+
+State: ~/.sift/state/interrupt-summary/{assign.json, last-run, stats-<to>.json}.
+"""
+import argparse
+import calendar
+import datetime as dt
+import json
+import os
+import re
+import subprocess
+import sys
+
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+SKILL = os.path.join(ROOT, "skills", "interrupt-summary")
+STATE = os.path.expanduser("~/.sift/state/interrupt-summary")
+TYPES = ("Task", "Bug", "Story")
+DONE, WONT = {"Done"}, {"Won't Do", "Duplicate", "Cancelled", "Canceled", "Closed", "Rejected"}
+
+
+def _type(t):
+    return t if t in ("Bug", "Story") else "Task"
+
+
+def _load(p):
+    with open(p) as f:
+        return json.load(f)
+
+
+def _dump(obj, p):
+    with open(p, "w") as f:
+        json.dump(obj, f, indent=1)
+        f.write("\n")
+
+
+def _taxonomy():
+    tax = _load(os.path.join(SKILL, "taxonomy.json"))
+    return {t: tax[t] for t in TYPES}
+
+
+def _six_months_before(to):
+    m = to.month - 6 + (12 if to.month <= 6 else 0)
+    y = to.year - (1 if to.month <= 6 else 0)
+    return dt.date(y, m, min(to.day, calendar.monthrange(y, m)[1]))
+
+
+def cmd_fetch(a):
+    to = dt.date.fromisoformat(a.to) if a.to else dt.date.today()
+    frm = dt.date.fromisoformat(a.from_) if a.from_ else _six_months_before(to)
+    jql = (f'project = CI AND created >= "{frm}" AND created < "{to + dt.timedelta(days=1)}" '
+           "ORDER BY created ASC")
+    out = subprocess.run([os.path.join(ROOT, "bin", "sift-jira"), "search", "--jql", jql, "--max", "3000"],
+                         capture_output=True, text=True)
+    if out.returncode:
+        sys.exit(out.stderr or out.stdout)
+    tickets = json.loads(out.stdout)
+    _dump({"from": str(frm), "to": str(to), "fetched": dt.datetime.now().isoformat(timespec="seconds"),
+           "tickets": tickets}, a.o)
+    print(f"{len(tickets)} CI tickets created {frm} – {to} -> {a.o}")
+
+
+def cmd_classify(a):
+    data, tax = _load(a.tickets), _taxonomy()
+    prior = _load(os.path.join(STATE, "assign.json")) if os.path.exists(os.path.join(STATE, "assign.json")) else {}
+    out, counts, fallbacks = {}, {}, []
+    for t in data["tickets"]:
+        ty, title = _type(t["type"]), t["summary"]
+        names = [c["name"] for c in tax[ty]]
+        p = prior.get(t["key"])
+        if p and p.get("category") in names and p.get("type") == ty:
+            row = {"type": ty, "category": p["category"], "by": "prior"}
+        else:
+            hit = next((c for c in tax[ty] if c["match"] and re.search(c["match"], title, re.I)), None)
+            if hit:
+                row = {"type": ty, "category": hit["name"], "by": "keyword"}
+            else:
+                row = {"type": ty, "category": next(c["name"] for c in tax[ty] if not c["match"]), "by": "fallback"}
+                fallbacks.append(t)
+        row["title"] = title
+        out[t["key"]] = row
+        counts.setdefault(ty, {}).setdefault(row["category"], {"n": 0, "by": {}})
+        counts[ty][row["category"]]["n"] += 1
+        counts[ty][row["category"]]["by"][row["by"]] = counts[ty][row["category"]]["by"].get(row["by"], 0) + 1
+    _dump(out, a.o)
+    for ty in TYPES:
+        print(f"== {ty}")
+        for c in tax[ty]:
+            v = counts.get(ty, {}).get(c["name"], {"n": 0, "by": {}})
+            print(f"  {v['n']:4d}  {c['name']}  {v['by']}")
+    print(f"\n{len(fallbacks)} fell through to a catch-all — check each in the manual pass:")
+    for t in fallbacks:
+        print(f"  {t['key']} [{_type(t['type'])} -> {out[t['key']]['category']}] {t['summary']}")
+
+
+def _months(frm, to):
+    out, y, m = [], frm.year, frm.month
+    while (y, m) <= (to.year, to.month):
+        last = calendar.monthrange(y, m)[1]
+        lo = frm.day if (y, m) == (frm.year, frm.month) else 1
+        hi = to.day if (y, m) == (to.year, to.month) else last
+        name = calendar.month_abbr[m]
+        label = name if (lo, hi) == (1, last) else f"{name} {lo}–{hi}"
+        out.append({"ym": f"{y}-{m:02d}", "label": label, "partial": (lo, hi) != (1, last),
+                    "span": f"{lo}–{hi} {name}", "full": calendar.month_name[m]})
+        y, m = (y + 1, 1) if m == 12 else (y, m + 1)
+    return out
+
+
+def _fmt_day(d):
+    return f"{d.day} {calendar.month_abbr[d.month]} {d.year}"
+
+
+def _stats(data, assign, tax):
+    frm, to = dt.date.fromisoformat(data["from"]), dt.date.fromisoformat(data["to"])
+    months = _months(frm, to)
+    idx = {m["ym"]: i for i, m in enumerate(months)}
+    series = {ty: [0] * len(months) for ty in TYPES}
+    cats = {ty: {c["name"]: {"n": 0, "done": 0, "open": 0, "wont": 0} for c in tax[ty]} for ty in TYPES}
+    errors, folded = [], 0
+    for t in data["tickets"]:
+        ty = _type(t["type"])
+        folded += t["type"] not in TYPES
+        series[ty][idx[t["created"][:7]]] += 1
+        row = assign.get(t["key"])
+        if not row:
+            errors.append(f"{t['key']}: not in assign.json")
+            continue
+        if row.get("category") not in cats[ty]:
+            errors.append(f"{t['key']}: '{row.get('category')}' is not a {ty} category")
+            continue
+        c = cats[ty][row["category"]]
+        c["n"] += 1
+        c["done" if t["status"] in DONE else "wont" if t["status"] in WONT else "open"] += 1
+    extra = sorted(set(assign) - {t["key"] for t in data["tickets"]})
+    if extra:
+        errors.append(f"assign.json has keys outside this window: {', '.join(extra[:10])}")
+    totals = {ty: sum(series[ty]) for ty in TYPES}
+    per_month = [sum(series[ty][i] for ty in TYPES) for i in range(len(months))]
+    story_status = {k: sum(c[k] for c in cats["Story"].values()) for k in ("done", "open", "wont")}
+    return {"from": str(frm), "to": str(to), "window": f"{_fmt_day(frm)} – {_fmt_day(to)}",
+            "months": months, "series": series, "per_month": per_month, "totals": totals,
+            "total": sum(totals.values()), "folded_into_task": folded, "categories": cats,
+            "story_status": story_status}, errors
+
+
+def _story_status(c):
+    parts = [f"{c['done']} done" if c["done"] else "", f"{c['open']} open" if c["open"] else "",
+             f"{c['wont']} won't do" if c["wont"] else ""]
+    return " · ".join(p for p in parts if p) or "—"
+
+
+def _rows(ty, tax, s, overrides):
+    rows = []
+    for c in tax[ty]:
+        n = s["categories"][ty][c["name"]]["n"]
+        if not n:
+            continue
+        o = overrides.get(ty, {}).get(c["name"], {})
+        last = _story_status(s["categories"][ty][c["name"]]) if ty == "Story" else o.get("change", c["change"])
+        rows.append([c["name"], n, o.get("what", c["what"]), last])
+    return sorted(rows, key=lambda r: -r[1])
+
+
+def cmd_render(a):
+    data, assign, tax = _load(a.tickets), _load(a.assign), _taxonomy()
+    notes = _load(a.notes) if a.notes else {}
+    s, errors = _stats(data, assign, tax)
+    if errors:
+        print(f"{len(errors)} problem(s) — fix assign.json and re-run:", file=sys.stderr)
+        for e in errors:
+            print("  " + e, file=sys.stderr)
+        sys.exit(1)
+    T = s["totals"]
+    peak = max(range(len(s["months"])), key=lambda i: s["per_month"][i])
+    full = [i for i, m in enumerate(s["months"]) if not m["partial"]] or list(range(len(s["months"])))
+    fpeak = max(full, key=lambda i: s["per_month"][i])
+    headline = (f"{s['total']} tickets: {T['Bug']} bugs, {T['Task']} tasks, {T['Story']} stories. "
+                f"Volume peaked at {s['per_month'][fpeak]} in {s['months'][fpeak]['full']}.")
+    partial = [f"{m['full']} covers {m['span']}" for m in s["months"] if m["partial"]]
+    ss = s["story_status"]
+    story_line = (f"{T['Story']} stories: {ss['done']} done, {ss['open']} open, {ss['wont']} closed Won't Do.")
+    folded = s["folded_into_task"]
+    foot = ("Source: Jira project CI via Sift (bin/sift-jira). "
+            + (f"Offboarding and sub-task tickets ({folded}) count as tasks. " if folded else "")
+            + f"Categories assigned by title keywords plus a manual pass. Data as of {data['fetched'][:10]}.")
+    frm, to = dt.date.fromisoformat(s["from"]), dt.date.fromisoformat(s["to"])
+    page = {
+        "title": ("Connect interrupts, last six months" if _six_months_before(to) == frm
+                  else f"Connect interrupts, {s['window']}"),
+        "eyebrow": f"Jira CI board · {s['window']}",
+        "headline": " ".join(x for x in (headline, notes.get("headline_note", "")) if x),
+        "partial_note": ("; ".join(partial) + ".") if partial else "",
+        "months": [m["label"] for m in s["months"]],
+        "series": s["series"],
+        "tasks": {"total": T["Task"], "note": notes.get("tasks_note", ""),
+                  "rows": _rows("Task", tax, s, notes.get("overrides", {}))},
+        "bugs": {"total": T["Bug"], "note": " ".join(x for x in (f"{T['Bug']} bugs.", notes.get("bugs_note", "")) if x),
+                 "rows": _rows("Bug", tax, s, notes.get("overrides", {}))},
+        "stories": {"total": T["Story"], "note": " ".join(x for x in (story_line, notes.get("stories_note", "")) if x),
+                    "rows": _rows("Story", tax, s, notes.get("overrides", {}))},
+        "foot": foot,
+    }
+    with open(os.path.join(SKILL, "template.html")) as f:
+        tpl = f.read()
+    blob = json.dumps(page, ensure_ascii=False).replace("</", "<\\/")
+    with open(a.o, "w") as f:
+        f.write(tpl.replace("/*__DATA__*/null", blob))
+    _dump(s, os.path.join(os.path.dirname(os.path.abspath(a.o)), "stats.json"))
+    print(f"wrote {a.o}")
+    print(headline)
+    print("per month: " + ", ".join(f"{m['label']} {n}" for m, n in zip(s["months"], s["per_month"])))
+    if peak != fpeak:
+        print(f"(partial month {s['months'][peak]['label']} had {s['per_month'][peak]}; headline uses full months)")
+    for ty in TYPES:
+        print(f"== {ty} ({T[ty]})")
+        for r in _rows(ty, tax, s, {}):
+            print(f"  {r[1]:4d}  {r[0]}" + (f"  [{r[3]}]" if ty == "Story" else ""))
+    print(story_line)
+
+
+def cmd_save(a):
+    os.makedirs(STATE, exist_ok=True)
+    p = os.path.join(STATE, "assign.json")
+    prior = _load(p) if os.path.exists(p) else {}
+    new = _load(os.path.join(a.dir, "assign.json"))
+    prior.update({k: {"type": v["type"], "category": v["category"]} for k, v in new.items()})
+    _dump(prior, p)
+    s = _load(os.path.join(a.dir, "stats.json"))
+    _dump(s, os.path.join(STATE, f"stats-{s['to']}.json"))
+    with open(os.path.join(STATE, "last-run"), "w") as f:
+        f.write(dt.date.today().isoformat() + "\n")
+    print(f"saved {len(new)} assignments ({len(prior)} total), stats-{s['to']}.json, last-run")
+
+
+def main():
+    ap = argparse.ArgumentParser(description="CI interrupt summary (skills/interrupt-summary). Read-only.")
+    sub = ap.add_subparsers(dest="cmd", required=True)
+    f = sub.add_parser("fetch")
+    f.add_argument("--from", dest="from_")
+    f.add_argument("--to")
+    f.add_argument("-o", required=True)
+    c = sub.add_parser("classify")
+    c.add_argument("tickets")
+    c.add_argument("-o", required=True)
+    r = sub.add_parser("render")
+    r.add_argument("tickets")
+    r.add_argument("assign")
+    r.add_argument("--notes")
+    r.add_argument("-o", required=True)
+    s = sub.add_parser("save")
+    s.add_argument("dir")
+    a = ap.parse_args()
+    {"fetch": cmd_fetch, "classify": cmd_classify, "render": cmd_render, "save": cmd_save}[a.cmd](a)
+
+
+if __name__ == "__main__":
+    main()

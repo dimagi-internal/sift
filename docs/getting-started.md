@@ -16,13 +16,14 @@ Interrupt) board.
 | **Backlog triage** ("triage the backlog", "clean up CCCT") | A ranked change list: stale, unowned, unestimated, duplicate, under-specified, mis-prioritized or mis-classified tickets, each with a concrete fix (close as a duplicate of X, ask for acceptance criteria, re-rank under epic Y). Also flags roadmap items with no delivery tickets, and tickets whose priority doesn't trace to a roadmap item. |
 | **Stale-ticket review** (monthly) | Per ticket in one project (CCCT or CCC): close, nudge, or leave. |
 | **Interrupt review** (weekly) | On the CI board: tickets nobody owns, that stopped moving, that have been open too long, or that don't belong there. Each gets a nudge, a flag, or a re-home. |
+| **Interrupt summary** (monthly, "interrupt summary") | The shared "Connect Interrupt Summary" page, rebuilt for the last six months: CI tickets per month by type, what each category of request is, and the product change that would take it off the board. Published after you approve the draft. |
 | **Grooming prep** ("prep grooming", "what's ready for Thursday") | One agenda per team (Blue, Green, Mobile): every CCCT ticket in the next sprint checked for component, acceptance criteria, links and description, with drafted fixes, and the team's capacity set against what's planned. |
 | **Roadmap questions** ("where does this fit?", "what matters most?") | Answers framed by the five 2027 goals (below), with capacity from the real team rosters, so recommendations are sized in sprints, not item counts. |
 | **Product-principles check** | Flags work that conflicts with a settled decision, notices when a new decision has been made, and drafts updates to the Confluence page. |
 | **Capacity refresh** | Re-reads the Connect Tech Sprint Performance dashboard for velocity and capacity, so sizing stays current. |
 
 Schedules (on canopy-web, America/New_York):
-- **Tuesday 08:00**: backlog sweep (roadmap intake, then triage and interrupts, plus the monthly stale and principles reviews when due).
+- **Tuesday 08:00**: backlog sweep (roadmap intake, then triage and interrupts, plus the monthly stale, principles and interrupt-summary reviews when due).
 - **Wednesday 08:00**: grooming prep for Thursday's grooming.
 
 Sift can also be asked at any time, in plain language.
