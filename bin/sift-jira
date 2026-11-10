@@ -26,10 +26,15 @@ Plan file (written by skills/clean-the-backlog, roadmap-intake and the other swe
      {"key": "CCCT-412", "op": "link", "type": "Duplicate", "outward": "CCCT-388", "why": "..."},
      {"op": "create", "ref": "tech-debt", "project": "CCC", "type": "Idea",
       "fields": {"summary": "...", "description": "plain text", "customfield_14111": [...]}, "why": "..."},
-     {"key": "CCCT-2067", "op": "link", "type": "Polaris work item link", "outward": "$tech-debt", "why": "..."}]}
+     {"key": "CCCT-2067", "op": "link", "type": "Polaris work item link", "outward": "$tech-debt", "why": "..."},
+     {"op": "create_sprint", "board": 2830, "name": "Blue Pod - Sprint 104",
+      "start": "2026-11-30T12:20:00.000Z", "end": "2026-12-14T12:20:00.000Z", "why": "..."},
+     {"op": "update_sprint", "sprint": 6576, "fields": {"endDate": "2027-01-11T05:00:00.000Z"}, "why": "..."}]}
   `create` makes a new issue; `description` is plain text (converted to ADF). Its `ref` names the
   new key for later rows: write "$<ref>" as any later row's `key` or `outward`. A row whose ref
   failed to create errors instead of running. In a dry run the ref stays a placeholder.
+  `create_sprint` / `update_sprint` work ONLY on the team boards (Blue 2830, Green 2829, Mobile 2831),
+  never the shared "All Connect Tech" board; update_sprint refuses a sprint whose origin board isn't one.
 
 Config (from ~/.sift/.env via bin/_env.py): sift_JIRA_SITE, sift_JIRA_EMAIL,
 sift_JIRA_API_TOKEN, sift_JIRA_PROJECTS.
@@ -148,6 +153,18 @@ def _agile(path, query=None):
             return json.loads(r.read())
     except urllib.error.HTTPError as e:
         sys.exit(f"Jira GET {path} -> {e.code}: {e.read().decode(errors='replace')[:500]}")
+
+
+def _agile_write(method, path, body):
+    base, headers = _client()
+    url = base.replace("/rest/api/3", "/rest/agile/1.0") + path
+    req = urllib.request.Request(url, data=json.dumps(body).encode(), headers=headers, method=method)
+    try:
+        with urllib.request.urlopen(req, timeout=60) as r:
+            raw = r.read()
+            return json.loads(raw) if raw else {}
+    except urllib.error.HTTPError as e:
+        raise ValueError(f"Jira {method} {path} -> {e.code}: {e.read().decode(errors='replace')[:500]}")
 
 
 def _jql_all(jql, fields):
@@ -331,6 +348,20 @@ def _apply_one(c, refs):
         if c.get("ref"):
             refs[c["ref"]] = made["key"]
         return made["key"]
+    if op == "create_sprint":
+        if c["board"] not in TEAM_BOARDS:
+            raise ValueError(f"board {c['board']} is not a team board {sorted(TEAM_BOARDS)}")
+        body = {"name": c["name"], "originBoardId": c["board"], "startDate": c["start"], "endDate": c["end"]}
+        if c.get("goal"):
+            body["goal"] = c["goal"]
+        made = _agile_write("POST", "/sprint", body)
+        return f"sprint {made['id']}"
+    if op == "update_sprint":
+        board = _agile(f"/sprint/{c['sprint']}").get("originBoardId")
+        if board not in TEAM_BOARDS:
+            raise ValueError(f"sprint {c['sprint']} is on board {board}, not a team board")
+        _agile_write("POST", f"/sprint/{c['sprint']}", c["fields"])
+        return None
     key = _resolve(c["key"], refs)
     if op == "comment":
         _call("POST", f"/issue/{key}/comment", {"body": _adf(c["body"])})
@@ -357,7 +388,13 @@ def cmd_apply(a):
     changes = plan.get("changes") or []
     results, refs = [], {}
     for c in changes:
-        line = {"key": c.get("key") or f"(new {c.get('project')} {c.get('type')} ${c.get('ref')})",
+        if c.get("op") == "create_sprint":
+            fallback = f"(new sprint {c.get('name')!r} on {TEAM_BOARDS.get(c.get('board'), c.get('board'))})"
+        elif c.get("op") == "update_sprint":
+            fallback = f"(sprint {c.get('sprint')}: {c.get('fields')})"
+        else:
+            fallback = f"(new {c.get('project')} {c.get('type')} ${c.get('ref')})"
+        line = {"key": c.get("key") or fallback,
                 "op": c.get("op"), "why": c.get("why")}
         if c.get("op") == "link":
             line["outward"] = c.get("outward")
