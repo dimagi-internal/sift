@@ -32,18 +32,18 @@
     {
       "tool_pattern": "(?i)^mcp__.*slack.*__\\w*(?:send_message|schedule_message|post_message|chat_post|reply|create_canvas|update_canvas|add_reaction)",
       "_pattern_doc": "Slack MCP write tools. Also covers connectors mounted under an opaque id only if 'slack' is in the name; the tool-name rail below catches the rest.",
-      "message": "BLOCKED: Sift never posts to Slack itself. Answer in this turn's reply — canopy-web relays it to the Slack thread that started the turn. To reach someone who didn't ask, put it on the board (/agents/sift) or email via bin/sift-email."
+      "message": "BLOCKED: Sift never posts to Slack itself. Answer in this turn's reply — canopy-web relays it to the Slack thread that started the turn. To reach someone who didn't ask, put it on the board (/agents/sift) or email via bin/sift-email. The one channel post (approved monthly interrupt summary to #connect-sift) goes through canopy-web share_session_to_slack (skills/interrupt-summary step 8)."
     },
     {
       "tool_pattern": "^mcp__.*__slack_(?:send_message|send_message_draft|schedule_message|create_canvas|update_canvas)$",
       "_pattern_doc": "claude.ai Slack connector, mounted under a UUID server name.",
-      "message": "BLOCKED: Sift never posts to Slack itself. Answer in this turn's reply — canopy-web relays it to the Slack thread that started the turn. To reach someone who didn't ask, put it on the board (/agents/sift) or email via bin/sift-email."
+      "message": "BLOCKED: Sift never posts to Slack itself. Answer in this turn's reply — canopy-web relays it to the Slack thread that started the turn. To reach someone who didn't ask, put it on the board (/agents/sift) or email via bin/sift-email. The one channel post (approved monthly interrupt summary to #connect-sift) goes through canopy-web share_session_to_slack (skills/interrupt-summary step 8)."
     },
     {
       "tool": "Bash",
       "_pattern_doc": "Raw Slack writes: Web API chat/canvas/files writes, incoming webhooks, or SDK calls. Requires an HTTP client / script runner in the command, so a commit message or grep that merely names the API passes.",
       "pattern": "(?s)^(?=.*\\b(?:curl|wget|https?|python3?|node|npx|deno|bun)\\b)(?=.*(?:slack\\.com/api/(?:chat\\.(?:postMessage|postEphemeral|update|delete|scheduleMessage|meMessage)|files\\.(?:upload|completeUploadExternal)|canvases\\.)|hooks\\.slack\\.com/|\\bchat_(?:postMessage|postEphemeral|update|scheduleMessage)\\b|\\bchat\\.postMessage\\b))",
-      "message": "BLOCKED: Sift never posts to Slack itself and holds no Slack token. Answer in this turn's reply — canopy-web relays it. To reach someone who didn't ask, use the board (/agents/sift) or bin/sift-email."
+      "message": "BLOCKED: Sift never posts to Slack itself and holds no Slack token. Answer in this turn's reply — canopy-web relays it. To reach someone who didn't ask, use the board (/agents/sift) or bin/sift-email. The one channel post (approved monthly interrupt summary to #connect-sift) goes through canopy-web share_session_to_slack (skills/interrupt-summary step 8)."
     }
   ],
   "approve": []

@@ -31,12 +31,13 @@ improvements ship once (a canopy PR) instead of N backports.
 - CCCT backlog requests ("clean the backlog", "triage the backlog", "clean up CCCT") → `skills/clean-the-backlog`; grooming prep
   ("prep grooming", "what's ready for Thursday") → `skills/grooming-prep`.
 - Interrupt trends ("interrupt summary", "what's coming into CI", "update the interrupt page") →
-  `skills/interrupt-summary`; monthly, run in the Tuesday sweep when
-  `~/.sift/state/interrupt-summary/last-run` is 28+ days old or missing.
+  `skills/interrupt-summary`; monthly on the 1st (its own schedule), posted to #connect-sift
+  after approval.
 - Sprint closed / "sprint report", "what did we finish in Sprint N" → `skills/sprint-report`.
   Each turn, check for newly closed sprints (cursor-guarded) and draft a report for any.
 - Schedules (canopy-web, America/New_York, prefer local): **Tue 08:00** backlog sweep (roadmap intake, then triage +
-  interrupts, plus monthly stale/principles/interrupt-summary reviews when due); **Wed 08:00** grooming prep for
+  interrupts, plus monthly stale/principles reviews when due); **1st of the month 08:00** interrupt summary (+ #connect-sift post);
+  **Wed 08:00** grooming prep for
   Thursday grooming. Change them on canopy-web (`/agents/sift`), not here.
 - Any roadmap, prioritization or "where does this fit" question → read `context/2027-themes.md`
   first and answer in terms of the five 2027 goals.
@@ -48,4 +49,6 @@ improvements ship once (a canopy PR) instead of N backports.
   `skills/capacity-refresh` before triage or prioritization work. Size work with
   `context/delivery-model.md` + the snapshot (team rosters, velocity, capacity notes).
 - Jira writes: only `bin/sift-jira apply <plan> --approved-by <name>` after Step 2 approval.
-- Slack: reply in the turn (canopy-web relays); Sift never posts to Slack itself.
+- Slack: reply in the turn (canopy-web relays); Sift never posts to Slack itself. ONE exception:
+  the approved monthly interrupt summary, via canopy-web `share_session_to_slack` to
+  `#connect-sift` (`skills/interrupt-summary` step 8).
