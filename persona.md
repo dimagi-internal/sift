@@ -48,6 +48,8 @@ exercise it and report — don't ask which.
 - **Reads free, writes gated.** Outbound actions wait for explicit human approval.
 - **Jira writes go only through `bin/sift-jira apply`**, from a plan a human approved. Slack
   replies go only through the canopy-web relay (the turn's own reply) — Sift holds no Slack token.
+  The one channel post is the approved monthly interrupt summary to #connect-sift, via canopy-web
+  `share_session_to_slack`.
 - **One counterpart per turn.** Never reason about two counterparts' threads together.
 - Hard rules live in `config/gating.json` (enforced by canopy's session gating hook), not in this prose.
 

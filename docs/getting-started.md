@@ -16,14 +16,15 @@ Interrupt) board.
 | **Backlog triage** ("triage the backlog", "clean up CCCT") | A ranked change list: stale, unowned, unestimated, duplicate, under-specified, mis-prioritized or mis-classified tickets, each with a concrete fix (close as a duplicate of X, ask for acceptance criteria, re-rank under epic Y). Also flags roadmap items with no delivery tickets, and tickets whose priority doesn't trace to a roadmap item. |
 | **Stale-ticket review** (monthly) | Per ticket in one project (CCCT or CCC): close, nudge, or leave. |
 | **Interrupt review** (weekly) | On the CI board: tickets nobody owns, that stopped moving, that have been open too long, or that don't belong there. Each gets a nudge, a flag, or a re-home. |
-| **Interrupt summary** (monthly, "interrupt summary") | The shared "Connect Interrupt Summary" page, rebuilt for the last six months: CI tickets per month by type, what each category of request is, and the product change that would take it off the board. Published after you approve the draft. |
+| **Interrupt summary** (1st of each month, or "interrupt summary") | The shared "Connect Interrupt Summary" page, rebuilt for the last six months: CI tickets per month by type, what each category of request is, and the product change that would take it off the board. After you approve the draft, the page is updated and a short summary is posted to #connect-sift. |
 | **Grooming prep** ("prep grooming", "what's ready for Thursday") | One agenda per team (Blue, Green, Mobile): every CCCT ticket in the next sprint checked for component, acceptance criteria, links and description, with drafted fixes, and the team's capacity set against what's planned. |
 | **Roadmap questions** ("where does this fit?", "what matters most?") | Answers framed by the five 2027 goals (below), with capacity from the real team rosters, so recommendations are sized in sprints, not item counts. |
 | **Product-principles check** | Flags work that conflicts with a settled decision, notices when a new decision has been made, and drafts updates to the Confluence page. |
 | **Capacity refresh** | Re-reads the Connect Tech Sprint Performance dashboard for velocity and capacity, so sizing stays current. |
 
 Schedules (on canopy-web, America/New_York):
-- **Tuesday 08:00**: backlog sweep (roadmap intake, then triage and interrupts, plus the monthly stale, principles and interrupt-summary reviews when due).
+- **Tuesday 08:00**: backlog sweep (roadmap intake, then triage and interrupts, plus the monthly stale and principles reviews when due).
+- **1st of the month, 08:00**: interrupt summary, posted to #connect-sift after approval.
 - **Wednesday 08:00**: grooming prep for Thursday's grooming.
 
 Sift can also be asked at any time, in plain language.
@@ -44,7 +45,7 @@ Not in priority order. Detail and the Jira `Goal` mapping: `context/2027-themes.
 
 ## How it works with you
 1. **Reads are free.** Sift searches Jira, Confluence and the dashboard without asking.
-2. **Writes need your approval.** Every finding becomes a reviewable change plan. Sift presents the batch; a human approves, strikes or rewords; only then does it apply the plan to Jira (`bin/sift-jira apply`, stamped with who approved it). Sift cannot write to Jira, Confluence or Slack any other way. This is enforced by rails in `config/gating.json`, not just by instruction.
+2. **Writes need your approval.** Every finding becomes a reviewable change plan. Sift presents the batch; a human approves, strikes or rewords; only then does it apply the plan to Jira (`bin/sift-jira apply`, stamped with who approved it). Sift cannot write to Jira, Confluence or Slack any other way (its one Slack post is the approved monthly interrupt summary, through canopy-web). This is enforced by rails in `config/gating.json`, not just by instruction.
 3. **It learns your rulings.** When you strike a change or state a rule ("don't flag X"), Sift logs it in `context/decisions.md` so it holds next time.
 4. **It reports plainly.** What it did, its recommendation, and what else it could do. Tickets are always linked.
 

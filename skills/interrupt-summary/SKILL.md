@@ -6,7 +6,7 @@ description: >
   product change that would take it off the board. Rebuilds the shared "Connect Interrupt
   Summary" artifact page for a rolling six-month window and republishes it after approval. Use
   when asked for "the interrupt summary", "what's coming into CI", "interrupt trends", "update the
-  interrupt page", or on Sift's monthly cadence. Per-ticket nudging is sift:review-interrupt.
+  interrupt page", or on Sift's monthly cadence (1st of the month, also posted to #connect-sift). Per-ticket nudging is sift:review-interrupt.
 argument-hint: "[--from YYYY-MM-DD] [--to YYYY-MM-DD]"
 ---
 
@@ -23,8 +23,10 @@ This is the *trend* view. Keeping individual interrupts moving is `sift:review-i
 - Project `CI`, tickets **created** in the window. Default: the six months up to today (same
   day-of-month). `--from` / `--to` override; a named month range ("May to October") is fine.
 - Types other than Bug and Story (Employee offboarding, Sub-Task, …) count as **Task**.
-- **Cadence: monthly.** `~/.sift/state/interrupt-summary/last-run` holds the last publish date;
-  the Tuesday sweep runs this skill when that date is 28+ days old (or missing).
+- **Cadence: monthly, on the 1st** (canopy-web schedule "Monthly interrupt summary", 08:00
+  America/New_York). That run also posts the summary to Slack `#connect-sift` (step 8).
+  An on-demand run posts to Slack only if the asker says so.
+  `~/.sift/state/interrupt-summary/last-run` holds the last publish date.
 - Read `context/decisions.md` first; the "Product change" column must not contradict a ruling
   or the Product Principles (CLAUDE.md). Flag any that does.
 
@@ -86,7 +88,10 @@ Turn reply (turn Step 2):
   peak 94 in July. Draft ready to replace the shared page."
 - What changed since the last published version (biggest category moves, notes rewritten,
   taxonomy edits), and how many tickets the manual pass moved.
-- Attach or link the draft HTML. Ask: publish to the shared page?
+- Attach or link the draft HTML.
+- On the monthly run, also show the exact Slack post (step 8) word for word.
+- Ask: publish to the shared page (and post to #connect-sift)? One yes covers both; the
+  approver may also approve the page and decline the post.
 
 ## 7. Publish, then save
 On a yes:
@@ -100,8 +105,28 @@ On a yes:
   category assignments forward, snapshots the stats, stamps `last-run`). If `taxonomy.json`
   changed, ship it (branch → PR → merge, per CLAUDE.md).
 
+## 8. Post to Slack (#connect-sift) — monthly run, after the page is published
+Only after the approved publish succeeded, so the link shows the new month. Sift's ONE
+sanctioned Slack post: canopy-web's `share_session_to_slack` tool (canopy-web posts it as the
+Sift app; Sift holds no Slack token). Call it with `channel: "#connect-sift"`,
+`mode: "broadcast"` and, in a canopy turn, `turn_id`. Post exactly the text the approver saw:
+```
+*Connect interrupts, <window>*
+<total> CI tickets: <bugs> bugs, <tasks> tasks, <stories> stories. <one line on the trend,
+e.g. "October (46) was the quietest full month.">
+• <the headline_note's main finding, one line>
+• <the bugs_note's main finding, one line>
+• <one notable change since last month, if any>
+Full page: https://claude.ai/artifact/2vochcmx84jjjk2gBFCkwY
+```
+Slack formatting: bold with single `*`, plain bullets, no emojis, no headings, under ~80 words.
+Numbers come from the render printout, as on the page. If the tool refuses (e.g. the canopy
+app isn't in the channel), report that and give the text for the approver to paste. Never
+retry through another Slack path.
+
 ## Never
 - Hand-type a count into notes that the printout doesn't show.
 - Publish without an explicit yes, or to a new artifact URL.
 - Write to Jira — this skill is read-only.
-- Post the page or summary to Slack directly — reply in the turn; canopy-web relays it.
+- Post to Slack any way other than step 8 (`share_session_to_slack`, `#connect-sift`, after an
+  explicit yes), or post a summary of a page that wasn't published.
