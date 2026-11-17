@@ -32,10 +32,12 @@ applying and updating the page all go through `skills/product-principles`.
   (not at invoicing).
 - **Visits:** FLWs can only view or claim work the system has funding to pay for.
 - **FLW communication:** be transparent. Every unpaid visit has an FLW-readable, trainable reason;
-  FLWs see how much paid work is left before doing it.
+  FLWs see how much paid work is left before doing it. Platform decisions are defensible and
+  explainable to LLOs and FLWs: choose the simple option over the overly complex one.
 - **Support:** fully self-service. No action requires contacting Dimagi, and there is no
   support team.
-- **Language:** the platform defaults to English, with British spellings (not American).
+- **Language:** the platform defaults to English, with British spellings (not American). In the
+  product, say "Connect Workers", not "Mobile Workers" or "FLWs".
 
 ## Hard guardrail — reads free, writes gated
 Search/read run freely. **Every outbound action (sending on a channel, public writes) requires
