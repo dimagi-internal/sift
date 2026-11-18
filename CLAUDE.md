@@ -31,6 +31,9 @@ applying and updating the page all go through `skills/product-principles`.
 - **Payments:** visits are paid on approval (not submission); the FX rate is the one at approval
   (not at invoicing).
 - **Visits:** FLWs can only view or claim work the system has funding to pay for.
+  A visit is judged by the rules the Connect Worker's phone had when the worker started it: a
+  restriction (suspension, relearn task, end date, limit change) that reaches the phone after the
+  visit began doesn't reject that visit on its own.
 - **FLW communication:** be transparent. Every unpaid visit has an FLW-readable, trainable reason;
   FLWs see how much paid work is left before doing it. Platform decisions are defensible and
   explainable to LLOs and FLWs: choose the simple option over the overly complex one.
