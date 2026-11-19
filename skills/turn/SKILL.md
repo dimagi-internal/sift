@@ -40,7 +40,7 @@ improvements ship once (a canopy PR) instead of N backports.
 - Schedules (canopy-web, America/New_York, prefer local): **Tue 08:00** backlog sweep (roadmap intake, then triage +
   interrupts, plus monthly stale/principles reviews when due); **1st of the month 08:00** interrupt summary (+ #connect-sift post);
   **Wed 08:00** grooming prep for
-  Thursday grooming; **Mon 08:00** sprint-start report (no-op unless a sprint started that day). Change them on canopy-web (`/agents/sift`), not here.
+  Thursday grooming; **Mon 08:00** sprint-start report, posted to #connect-sift after approval (no-op unless a sprint started that day). Change them on canopy-web (`/agents/sift`), not here.
 - Any roadmap, prioritization or "where does this fit" question → read `context/2027-themes.md`
   first and answer in terms of the five 2027 goals.
 - Decisions: read `context/decisions.md` before proposing anything. After any approval step,
