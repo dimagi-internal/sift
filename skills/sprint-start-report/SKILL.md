@@ -57,7 +57,12 @@ Rules:
 - Flag anything conflicting with the Product Principles or `context/decisions.md`.
 - Keep it to a screen per team.
 
-## 4. Present and record
-Put the report in the turn's reply. If the turn was scheduled rather than asked, draft it and
-wait for approval before posting anywhere else (e.g. #connect-sift). After delivery:
-`canopy cursor bump sprint-start-report --local ~/.sift/state --items - < "$T/started.json"`.
+## 4. Present, post, record
+Put the report in the turn's reply. On a scheduled run, present ONE approval request to Mary: the
+report as drafted and the exact #connect-sift post (the same text). Post nothing without an
+explicit yes. After a yes, post the approved text to #connect-sift via canopy-web
+`share_session_to_slack` (broadcast, with this turn's turn_id). If the asker is present in
+#connect-sift and the turn is a named request, the turn's reply is the post. Log any declines in
+`context/decisions.md`.
+
+After delivery: `canopy cursor bump sprint-start-report --local ~/.sift/state --items - < "$T/started.json"`.
